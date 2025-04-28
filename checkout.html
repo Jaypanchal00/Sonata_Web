@@ -1,0 +1,1114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout - Sonata</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        .step {
+            text-align: center;
+            position: relative;
+        }
+        .step-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #fff;
+            border: 2px solid #dee2e6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 8px;
+            transition: all 0.3s ease;
+        }
+        .step.active .step-circle {
+            background-color: #000;
+            border-color: #000;
+            color: #fff;
+            transform: scale(1.1);
+        }
+        .step.completed .step-circle {
+            background-color: #28a745;
+            border-color: #28a745;
+            color: #fff;
+        }
+        .step:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            top: 20px;
+            right: -50%;
+            width: 100%;
+            height: 2px;
+            background-color: #e9ecef;
+            z-index: -1;
+            transition: background-color 0.3s ease;
+        }
+        .step.completed:not(:last-child)::after {
+            background-color: #28a745;
+        }
+        .checkout-section {
+            display: none;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        .checkout-section.active {
+            display: block;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .form-control:focus {
+            border-color: #000;
+            box-shadow: 0 0 0 0.25rem rgba(0, 0, 0, 0.1);
+        }
+        .payment-method {
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .payment-method:hover {
+            border-color: #adb5bd;
+        }
+        .payment-method.selected {
+            border-color: #000;
+            background-color: #f8f9fa;
+        }
+        .cart-item {
+            transition: background-color 0.3s ease;
+        }
+        .cart-item:hover {
+            background-color: #f8f9fa;
+        }
+        .promo-badge {
+            background-color: #ffeeba;
+            color: #856404;
+            font-size: 0.8rem;
+            padding: 3px 8px;
+            border-radius: 12px;
+        }
+        .sticky-summary {
+            position: sticky;
+            top: 20px;
+        }
+        #cartCount {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background-color: #dc3545;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .address-card {
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .address-card:hover {
+            border-color: #adb5bd;
+        }
+        .address-card.selected {
+            border-color: #000;
+            background-color: #f8f9fa;
+        }
+        .saved-card {
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .saved-card:hover {
+            border-color: #adb5bd;
+        }
+        .saved-card.selected {
+            border-color: #000;
+            background-color: #f8f9fa;
+        }
+        .progress {
+            height: 6px;
+            border-radius: 3px;
+            overflow: visible;
+        }
+        .progress-bar {
+            transition: width 0.5s ease;
+            position: relative;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg bg-white shadow-sm px-4 py-2">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="index.html">
+                <img src="https://www.sonatawatches.in/on/demandware.static/-/Library-Sites-SonataSharedLibrary/default/dw03b590d6/images/sonataLogo.svg"
+                    alt="Sonata Logo" class="navbar-logo" style="height: 30px; width: auto;" />
+            </a>
+            <div class="top-icons d-flex align-items-center ms-auto gap-3">
+                <a href="login.html" class="text-dark text-decoration-none">
+                    <i class="bi bi-person fs-5"></i>
+                </a>
+                <a href="wishlist.html" class="text-dark text-decoration-none">
+                    <i class="bi bi-heart fs-5"></i>
+                </a>
+                <a href="cart.html" class="text-dark text-decoration-none position-relative">
+                    <i class="bi bi-bag fs-5"></i>
+                    <span class="cart-count" id="cartCount">0</span>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="progress mb-4">
+            <div class="progress-bar bg-dark" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+        </div>
+        <div class="d-flex justify-content-between">
+            <div class="step active" data-step="1">
+                <div class="step-circle">
+                    <i class="bi bi-truck"></i>
+                </div>
+                <div>Shipping</div>
+            </div>
+            <div class="step" data-step="2">
+                <div class="step-circle">
+                    <i class="bi bi-credit-card"></i>
+                </div>
+                <div>Payment</div>
+            </div>
+            <div class="step" data-step="3">
+                <div class="step-circle">
+                    <i class="bi bi-check-circle"></i>
+                </div>
+                <div>Review</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container my-5">
+        <h2 class="mb-4">Checkout</h2>
+        
+        <div class="row">
+            <div class="col-md-8">
+                <!-- Shipping Section -->
+                <div class="checkout-section active" id="shippingSection">
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center mb-4">
+                                <h4 class="mb-0">Shipping Information</h4>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="savedAddressCheck">
+                                    <label class="form-check-label" for="savedAddressCheck">
+                                        Use saved address
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div id="savedAddresses" style="display: none;">
+                                <div class="address-card mb-3 selected">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div>
+                                            <h6>Home</h6>
+                                            <p class="mb-1" id="savedAddressName"></p>
+                                            <p class="mb-1" id="savedAddressLine1"></p>
+                                            <p class="mb-1" id="savedAddressLine2"></p>
+                                            <p class="mb-0" id="savedAddressPhone"></p>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="addressRadio" id="address1" checked>
+                                        </div>
+                                    </div>
+                                </div>
+                                <button class="btn btn-outline-dark btn-sm mt-3" id="addNewAddressBtn">
+                                    <i class="bi bi-plus-circle me-1"></i> Add New Address
+                                </button>
+                            </div>
+
+                            <form id="shippingForm">
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label">First Name</label>
+                                        <input type="text" class="form-control" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Last Name</label>
+                                        <input type="text" class="form-control" required>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Email</label>
+                                    <input type="email" class="form-control" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Phone</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">+91</span>
+                                        <input type="tel" class="form-control" required pattern="[0-9]{10}" title="Please enter a valid 10-digit phone number">
+                                    </div>
+                                    <div class="form-text">Format: 10 digits without spaces</div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Address Line 1</label>
+                                    <input type="text" class="form-control" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Address Line 2 (Optional)</label>
+                                    <input type="text" class="form-control">
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label">City</label>
+                                        <input type="text" class="form-control" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">State</label>
+                                        <select class="form-select" required>
+                                            <option value="">Select State</option>
+                                            <option value="AP">Andhra Pradesh</option>
+                                            <option value="AR">Arunachal Pradesh</option>
+                                            <option value="AS">Assam</option>
+                                            <option value="BR">Bihar</option>
+                                            <option value="CT">Chhattisgarh</option>
+                                            <option value="GA">Goa</option>
+                                            <option value="GJ">Gujarat</option>
+                                            <option value="HR">Haryana</option>
+                                            <option value="HP">Himachal Pradesh</option>
+                                            <option value="JH">Jharkhand</option>
+                                            <option value="KA">Karnataka</option>
+                                            <option value="KL">Kerala</option>
+                                            <option value="MP">Madhya Pradesh</option>
+                                            <option value="MH">Maharashtra</option>
+                                            <option value="MN">Manipur</option>
+                                            <option value="ML">Meghalaya</option>
+                                            <option value="MZ">Mizoram</option>
+                                            <option value="NL">Nagaland</option>
+                                            <option value="OR">Odisha</option>
+                                            <option value="PB">Punjab</option>
+                                            <option value="RJ">Rajasthan</option>
+                                            <option value="SK">Sikkim</option>
+                                            <option value="TN">Tamil Nadu</option>
+                                            <option value="TG">Telangana</option>
+                                            <option value="TR">Tripura</option>
+                                            <option value="UT">Uttarakhand</option>
+                                            <option value="UP">Uttar Pradesh</option>
+                                            <option value="WB">West Bengal</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label">Postal Code</label>
+                                        <input type="text" class="form-control" required pattern="[0-9]{6}" title="Please enter a valid 6-digit postal code">
+                                        <div class="form-text">Format: 6 digits without spaces</div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Country</label>
+                                        <input type="text" class="form-control" value="India" readonly>
+                                    </div>
+                                </div>
+
+                                <div class="form-check mb-3">
+                                    <input class="form-check-input" type="checkbox" id="saveAddress">
+                                    <label class="form-check-label" for="saveAddress">
+                                        Save this address for future orders
+                                    </label>
+                                </div>
+
+                                <h5 class="mt-4 mb-3">Shipping Options</h5>
+                                <div class="card mb-3">
+                                    <div class="card-body">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="shippingOption" id="standardShipping" checked>
+                                            <label class="form-check-label d-flex justify-content-between w-100" for="standardShipping">
+                                                <span>
+                                                    <strong>Standard Shipping</strong>
+                                                    <p class="text-muted mb-0">Delivery in 5-7 business days</p>
+                                                </span>
+                                                <span>Free</span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card mb-3">
+                                    <div class="card-body">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="shippingOption" id="expressShipping">
+                                            <label class="form-check-label d-flex justify-content-between w-100" for="expressShipping">
+                                                <span>
+                                                    <strong>Express Shipping</strong>
+                                                    <p class="text-muted mb-0">Delivery in 2-3 business days</p>
+                                                </span>
+                                                <span>₹99</span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card mb-3">
+                                    <div class="card-body">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="shippingOption" id="overnightShipping">
+                                            <label class="form-check-label d-flex justify-content-between w-100" for="overnightShipping">
+                                                <span>
+                                                    <strong>Overnight Shipping</strong>
+                                                    <p class="text-muted mb-0">Delivery in 1 business day</p>
+                                                </span>
+                                                <span>₹249</span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="d-flex justify-content-end mt-4">
+                                    <button type="button" class="btn btn-dark" id="shippingNextBtn">Continue to Payment</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Payment Section -->
+                <div class="checkout-section" id="paymentSection">
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <h4 class="mb-4">Payment Method</h4>
+                            
+                            <div class="payment-method selected mb-3" data-method="card">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="paymentMethod" id="creditCard" checked>
+                                    <label class="form-check-label" for="creditCard">
+                                        <div class="d-flex align-items-center">
+                                            <i class="bi bi-credit-card fs-4 me-2"></i>
+                                            <span>Credit/Debit Card</span>
+                                        </div>
+                                    </label>
+                                </div>
+                                
+                                <div id="savedCards" class="mt-3 mb-3" style="display: none;">
+                                    <h6>Saved Cards</h6>
+                                    <div class="saved-card mb-2 selected">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <div class="d-flex align-items-center">
+                                                    <i class="bi bi-credit-card me-2"></i>
+                                                    <span id="savedCardNumber"></span>
+                                                </div>
+                                                <small class="text-muted" id="savedCardExpiry"></small>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="savedCardRadio" id="card1" checked>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <button class="btn btn-outline-dark btn-sm" id="addNewCardBtn">
+                                        <i class="bi bi-plus-circle me-1"></i> Add New Card
+                                    </button>
+                                </div>
+                                
+                                <div id="cardForm" class="mt-3">
+                                    <form id="paymentForm">
+                                        <div class="mb-3">
+                                            <label class="form-label">Card Number</label>
+                                            <div class="input-group">
+                                                <input type="text" class="form-control" placeholder="1234 5678 9012 3456" required pattern="[0-9\s]{13,19}" title="Please enter a valid card number">
+                                                <span class="input-group-text">
+                                                    <i class="bi bi-credit-card"></i>
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="row mb-3">
+                                            <div class="col-md-6">
+                                                <label class="form-label">Expiry Date</label>
+                                                <input type="text" class="form-control" placeholder="MM/YY" required pattern="(0[1-9]|1[0-2])\/([0-9]{2})" title="Please enter a valid date in MM/YY format">
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label">CVV</label>
+                                                <input type="text" class="form-control" placeholder="123" required pattern="[0-9]{3,4}" title="Please enter a valid CVV (3 or 4 digits)">
+                                            </div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Cardholder Name</label>
+                                            <input type="text" class="form-control" required>
+                                        </div>
+                                        <div class="form-check mb-3">
+                                            <input class="form-check-input" type="checkbox" id="saveCard">
+                                            <label class="form-check-label" for="saveCard">
+                                                Save this card for future payments
+                                            </label>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                            
+                            <div class="payment-method mb-3" data-method="upi">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="paymentMethod" id="upiPayment">
+                                    <label class="form-check-label" for="upiPayment">
+                                        <div class="d-flex align-items-center">
+                                            <i class="bi bi-phone fs-4 me-2"></i>
+                                            <span>UPI</span>
+                                        </div>
+                                    </label>
+                                </div>
+                                <div id="upiForm" class="mt-3" style="display: none;">
+                                    <div class="mb-3">
+                                        <label class="form-label">UPI ID</label>
+                                        <input type="text" class="form-control" placeholder="yourname@upi">
+                                    </div>
+                                    <div class="text-center mt-3">
+                                        <p>OR</p>
+                                        <p>Scan the QR code with your UPI app</p>
+                                        <div class="d-flex justify-content-center my-3">
+                                            <div style="width: 150px; height: 150px; background-color: #f8f9fa; border: 1px solid #dee2e6; display: flex; align-items: center; justify-content: center;">
+                                                <i class="bi bi-qr-code fs-1"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="payment-method mb-3" data-method="netbanking">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="paymentMethod" id="netBanking">
+                                    <label class="form-check-label" for="netBanking">
+                                        <div class="d-flex align-items-center">
+                                            <i class="bi bi-bank fs-4 me-2"></i>
+                                            <span>Net Banking</span>
+                                        </div>
+                                    </label>
+                                </div>
+                                <div id="netBankingForm" class="mt-3" style="display: none;">
+                                    <div class="mb-3">
+                                        <label class="form-label">Select Bank</label>
+                                        <select class="form-select">
+                                            <option value="">Select your bank</option>
+                                            <option value="hdfc">HDFC Bank</option>
+                                            <option value="sbi">State Bank of India</option>
+                                            <option value="icici">ICICI Bank</option>
+                                            <option value="axis">Axis Bank</option>
+                                            <option value="kotak">Kotak Mahindra Bank</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="payment-method" data-method="cod">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="paymentMethod" id="cashOnDelivery">
+                                    <label class="form-check-label" for="cashOnDelivery">
+                                        <div class="d-flex align-items-center">
+                                            <i class="bi bi-cash-stack fs-4 me-2"></i>
+                                            <span>Cash on Delivery</span>
+                                        </div>
+                                    </label>
+                                </div>
+                                <div id="codForm" class="mt-3" style="display: none;">
+                                    <div class="alert alert-info">
+                                        <i class="bi bi-info-circle me-2"></i>
+                                        Cash on Delivery is available for orders under ₹10,000. A nominal fee of ₹49 will be added to your order.
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="d-flex justify-content-between mt-4">
+                                <button type="button" class="btn btn-outline-dark" id="paymentBackBtn">Back to Shipping</button>
+                                <button type="button" class="btn btn-dark" id="paymentNextBtn">Review Order</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Review Section -->
+                <div class="checkout-section" id="reviewSection">
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <h4 class="mb-4">Order Review</h4>
+                            
+                            <div class="mb-4">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <h5>Shipping Address</h5>
+                                    <button class="btn btn-sm btn-link" id="editShippingBtn">Edit</button>
+                                </div>
+                                <div class="p-3 bg-light rounded" id="reviewShippingAddress">
+                                    <!-- Shipping address will be dynamically added here -->
+                                </div>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <h5>Payment Method</h5>
+                                    <button class="btn btn-sm btn-link" id="editPaymentBtn">Edit</button>
+                                </div>
+                                <div class="p-3 bg-light rounded" id="reviewPaymentMethod">
+                                    <!-- Payment method will be dynamically added here -->
+                                </div>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <h5>Order Items</h5>
+                                    <a href="cart.html" class="btn btn-sm btn-link">Edit</a>
+                                </div>
+                                <div id="reviewOrderItems">
+                                    <!-- Order items will be dynamically added here -->
+                                </div>
+                            </div>
+                            
+                            <div class="alert alert-warning" role="alert">
+                                <div class="d-flex">
+                                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                                    <div>
+                                        <strong>Important:</strong> By completing this purchase, you agree to our <a href="#" class="alert-link">Terms of Service</a> and <a href="#" class="alert-link">Privacy Policy</a>.
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="d-flex justify-content-between mt-4">
+                                <button type="button" class="btn btn-outline-dark" id="reviewBackBtn">Back to Payment</button>
+                                <button type="button" class="btn btn-success" id="placeOrderBtn">
+                                    <i class="bi bi-check-circle me-2"></i>Place Order
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="card sticky-summary mb-4">
+                    <div class="card-body">
+                        <h4 class="mb-4">Order Summary</h4>
+                        <div id="orderItems">
+                            <!-- Order items will be dynamically added here -->
+                        </div>
+                        
+                        <div class="mt-3 mb-3">
+                            <div class="input-group">
+                                <input type="text" class="form-control" placeholder="Promo code" id="promoCode">
+                                <button class="btn btn-outline-dark" type="button" id="applyPromoBtn">Apply</button>
+                            </div>
+                            <div id="promoMessage" class="mt-2"></div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Subtotal</span>
+                            <span id="subtotal">₹0</span>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Shipping</span>
+                            <span id="shipping">Free</span>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Tax</span>
+                            <span id="tax">₹0</span>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between mb-2" id="promoDiscount" style="display: none;">
+                            <span>Promo Discount</span>
+                            <span class="text-success" id="discountAmount">-₹0</span>
+                        </div>
+                        
+                        <hr>
+                        
+                        <div class="d-flex justify-content-between mb-3">
+                            <strong>Total</strong>
+                            <strong id="total">₹0</strong>
+                        </div>
+                        
+                        <div class="alert alert-info">
+                            <i class="bi bi-info-circle me-2"></i>
+                            <small>Free shipping on orders above ₹999</small>
+                        </div>
+                        
+                        <div class="d-flex align-items-center mb-3">
+                            <i class="bi bi-shield-check text-success me-2"></i>
+                            <small>Secure checkout with 256-bit SSL encryption</small>
+                        </div>
+                        
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-arrow-return-left text-primary me-2"></i>
+                            <small>Easy returns within 14 days of delivery</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Initialize cart count
+        function updateCartCount() {
+            const cart = JSON.parse(localStorage.getItem('cart')) || [];
+            const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+            document.getElementById('cartCount').textContent = totalItems;
+            
+            if (totalItems === 0) {
+                window.location.href = 'cart.html';
+            }
+        }
+
+        // Enhanced error handling
+        function showError(element, message) {
+            const existingError = element.parentNode.querySelector('.invalid-feedback');
+            if (existingError) {
+                existingError.remove();
+            }
+            
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'invalid-feedback d-block text-danger';
+            errorDiv.innerHTML = `<i class="bi bi-exclamation-circle me-1"></i>${message}`;
+            
+            element.parentNode.appendChild(errorDiv);
+            element.classList.add('is-invalid');
+            errorDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            
+            setTimeout(() => {
+                errorDiv.remove();
+                element.classList.remove('is-invalid');
+            }, 5000);
+        }
+
+        // Step navigation
+        let currentStep = 1;
+        const steps = document.querySelectorAll('.step');
+        const sections = document.querySelectorAll('.checkout-section');
+        const progressBar = document.querySelector('.progress-bar');
+
+        function updateProgress() {
+            const progress = ((currentStep - 1) / (steps.length - 1)) * 100;
+            progressBar.style.width = `${progress}%`;
+            progressBar.setAttribute('aria-valuenow', progress);
+        }
+
+        function updateSteps() {
+            steps.forEach((step, index) => {
+                if (index + 1 < currentStep) {
+                    step.classList.add('completed');
+                    step.classList.remove('active');
+                } else if (index + 1 === currentStep) {
+                    step.classList.add('active');
+                    step.classList.remove('completed');
+                } else {
+                    step.classList.remove('active', 'completed');
+                }
+            });
+
+            sections.forEach((section, index) => {
+                if (index + 1 === currentStep) {
+                    section.classList.add('active');
+                } else {
+                    section.classList.remove('active');
+                }
+            });
+        }
+
+        // Shipping form validation
+        function validateShippingForm() {
+            const form = document.getElementById('shippingForm');
+            const requiredFields = form.querySelectorAll('[required]');
+            let isValid = true;
+            let formData = {};
+
+            requiredFields.forEach(field => {
+                if (!field.value.trim()) {
+                    showError(field, `${field.previousElementSibling.textContent.trim()} is required`);
+                    isValid = false;
+                } else {
+                    formData[field.id] = field.value.trim();
+                }
+            });
+
+            const phoneInput = form.querySelector('input[type="tel"]');
+            if (phoneInput && !/^[0-9]{10}$/.test(phoneInput.value)) {
+                showError(phoneInput, 'Please enter a valid 10-digit phone number');
+                isValid = false;
+            } else if (phoneInput) {
+                formData.phone = phoneInput.value.trim();
+            }
+
+            const emailInput = form.querySelector('input[type="email"]');
+            if (emailInput && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailInput.value)) {
+                showError(emailInput, 'Please enter a valid email address');
+                isValid = false;
+            } else if (emailInput) {
+                formData.email = emailInput.value.trim();
+            }
+
+            const postalCodeInput = form.querySelector('input[pattern="[0-9]{6}"]');
+            if (postalCodeInput && !/^[0-9]{6}$/.test(postalCodeInput.value)) {
+                showError(postalCodeInput, 'Please enter a valid 6-digit postal code');
+                isValid = false;
+            } else if (postalCodeInput) {
+                formData.postalCode = postalCodeInput.value.trim();
+            }
+
+            const stateSelect = form.querySelector('select[required]');
+            if (stateSelect && !stateSelect.value) {
+                showError(stateSelect, 'Please select a state');
+                isValid = false;
+            } else if (stateSelect) {
+                formData.state = stateSelect.value;
+            }
+
+            if (isValid) {
+                localStorage.setItem('shippingData', JSON.stringify(formData));
+            }
+
+            return isValid;
+        }
+
+        // Payment form validation
+        function validatePaymentForm() {
+            const selectedMethod = document.querySelector('.payment-method.selected');
+            if (!selectedMethod) {
+                showError(document.querySelector('.payment-method'), 'Please select a payment method');
+                return false;
+            }
+
+            const methodType = selectedMethod.dataset.method;
+            let formData = { method: methodType };
+
+            if (methodType === 'card') {
+                const form = document.getElementById('paymentForm');
+                const cardNumber = form.querySelector('input[placeholder="1234 5678 9012 3456"]');
+                const expiryDate = form.querySelector('input[placeholder="MM/YY"]');
+                const cvv = form.querySelector('input[placeholder="123"]');
+                const cardholderName = form.querySelector('input[placeholder="Cardholder Name"]');
+
+                if (!/^[0-9\s]{13,19}$/.test(cardNumber.value)) {
+                    showError(cardNumber, 'Please enter a valid card number');
+                    return false;
+                }
+                formData.cardNumber = cardNumber.value.trim();
+
+                if (!/^(0[1-9]|1[0-2])\/([0-9]{2})$/.test(expiryDate.value)) {
+                    showError(expiryDate, 'Please enter a valid expiry date (MM/YY)');
+                    return false;
+                }
+                formData.expiryDate = expiryDate.value.trim();
+
+                if (!/^[0-9]{3,4}$/.test(cvv.value)) {
+                    showError(cvv, 'Please enter a valid CVV');
+                    return false;
+                }
+                formData.cvv = cvv.value.trim();
+
+                if (!cardholderName.value.trim()) {
+                    showError(cardholderName, 'Please enter cardholder name');
+                    return false;
+                }
+                formData.cardholderName = cardholderName.value.trim();
+            }
+
+            localStorage.setItem('paymentData', JSON.stringify(formData));
+            return true;
+        }
+
+        // Order review update
+        function updateOrderReview() {
+            try {
+                const shippingData = JSON.parse(localStorage.getItem('shippingData')) || {};
+                const reviewShippingAddress = document.getElementById('reviewShippingAddress');
+                reviewShippingAddress.innerHTML = '';
+
+                const addressContent = document.createElement('div');
+                
+                if (shippingData.firstName || shippingData.lastName) {
+                    const nameElement = document.createElement('p');
+                    nameElement.className = 'mb-1';
+                    nameElement.textContent = `${shippingData.firstName || ''} ${shippingData.lastName || ''}`.trim();
+                    addressContent.appendChild(nameElement);
+                }
+
+                if (shippingData.address1) {
+                    const address1Element = document.createElement('p');
+                    address1Element.className = 'mb-1';
+                    address1Element.textContent = shippingData.address1;
+                    addressContent.appendChild(address1Element);
+                }
+
+                if (shippingData.address2) {
+                    const address2Element = document.createElement('p');
+                    address2Element.className = 'mb-1';
+                    address2Element.textContent = shippingData.address2;
+                    addressContent.appendChild(address2Element);
+                }
+
+                if (shippingData.city || shippingData.state || shippingData.postalCode) {
+                    const locationElement = document.createElement('p');
+                    locationElement.className = 'mb-1';
+                    const locationParts = [];
+                    if (shippingData.city) locationParts.push(shippingData.city);
+                    if (shippingData.state) locationParts.push(shippingData.state);
+                    if (shippingData.postalCode) locationParts.push(shippingData.postalCode);
+                    locationElement.textContent = locationParts.join(', ');
+                    addressContent.appendChild(locationElement);
+                }
+
+                if (shippingData.phone) {
+                    const phoneElement = document.createElement('p');
+                    phoneElement.className = 'mb-1';
+                    phoneElement.textContent = `Phone: +91 ${shippingData.phone}`;
+                    addressContent.appendChild(phoneElement);
+                }
+
+                if (shippingData.email) {
+                    const emailElement = document.createElement('p');
+                    emailElement.className = 'mb-0';
+                    emailElement.textContent = `Email: ${shippingData.email}`;
+                    addressContent.appendChild(emailElement);
+                }
+
+                reviewShippingAddress.appendChild(addressContent);
+
+                const paymentData = JSON.parse(localStorage.getItem('paymentData')) || {};
+                const reviewPaymentMethod = document.getElementById('reviewPaymentMethod');
+                reviewPaymentMethod.innerHTML = '';
+
+                if (paymentData.method) {
+                    const paymentContent = document.createElement('p');
+                    paymentContent.className = 'mb-0';
+                    
+                    if (paymentData.method === 'card') {
+                        paymentContent.textContent = `Credit/Debit Card (**** **** **** ${paymentData.cardNumber ? paymentData.cardNumber.slice(-4) : 'XXXX'})`;
+                    } else {
+                        paymentContent.textContent = paymentData.method.charAt(0).toUpperCase() + paymentData.method.slice(1);
+                    }
+                    
+                    reviewPaymentMethod.appendChild(paymentContent);
+                }
+
+                const cart = JSON.parse(localStorage.getItem('cart')) || [];
+                const reviewOrderItems = document.getElementById('reviewOrderItems');
+                reviewOrderItems.innerHTML = '';
+
+                cart.forEach(item => {
+                    const itemDiv = document.createElement('div');
+                    itemDiv.className = 'd-flex justify-content-between align-items-center mb-2';
+                    itemDiv.innerHTML = `
+                        <div>
+                            <h6 class="mb-0">${item.name}</h6>
+                            <small class="text-muted">Qty: ${item.quantity}</small>
+                        </div>
+                        <div>₹${item.price * item.quantity}</div>
+                    `;
+                    reviewOrderItems.appendChild(itemDiv);
+                });
+
+            } catch (error) {
+                console.error('Error updating order review:', error);
+                showError(document.getElementById('reviewSection'), 'Error loading order details. Please try again.');
+            }
+        }
+
+        // Order summary calculations
+        function calculateSubtotal() {
+            const cart = JSON.parse(localStorage.getItem('cart')) || [];
+            return cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+        }
+
+        function updateOrderSummary() {
+            const subtotal = calculateSubtotal();
+            const tax = Math.round(subtotal * 0.05);
+            const shipping = subtotal >= 999 ? 0 : 99;
+            
+            document.getElementById('subtotal').textContent = `₹${subtotal}`;
+            document.getElementById('tax').textContent = `₹${tax}`;
+            document.getElementById('shipping').textContent = shipping === 0 ? 'Free' : `₹${shipping}`;
+            
+            updateTotal();
+        }
+
+        function updateTotal() {
+            const subtotal = calculateSubtotal();
+            const tax = Math.round(subtotal * 0.05);
+            const shipping = subtotal >= 999 ? 0 : 99;
+            const discount = promoDiscount.style.display === 'flex' ? 
+                parseInt(discountAmount.textContent.replace('-₹', '')) : 0;
+            
+            const total = subtotal + tax + shipping - discount;
+            document.getElementById('total').textContent = `₹${total}`;
+        }
+
+        // Event Listeners
+        document.addEventListener('DOMContentLoaded', () => {
+            updateCartCount();
+            updateOrderSummary();
+        });
+
+        // Shipping form events
+        document.getElementById('shippingNextBtn').addEventListener('click', () => {
+            if (validateShippingForm()) {
+                currentStep = 2;
+                updateSteps();
+                updateProgress();
+            }
+        });
+
+        // Payment form events
+        document.getElementById('paymentBackBtn').addEventListener('click', () => {
+            currentStep = 1;
+            updateSteps();
+            updateProgress();
+        });
+
+        document.getElementById('paymentNextBtn').addEventListener('click', () => {
+            if (validatePaymentForm()) {
+                currentStep = 3;
+                updateSteps();
+                updateProgress();
+                updateOrderReview();
+            }
+        });
+
+        // Review section events
+        document.getElementById('reviewBackBtn').addEventListener('click', () => {
+            currentStep = 2;
+            updateSteps();
+            updateProgress();
+        });
+
+        document.getElementById('editShippingBtn').addEventListener('click', () => {
+            currentStep = 1;
+            updateSteps();
+            updateProgress();
+        });
+
+        document.getElementById('editPaymentBtn').addEventListener('click', () => {
+            currentStep = 2;
+            updateSteps();
+            updateProgress();
+        });
+
+        // Place order
+        document.getElementById('placeOrderBtn').addEventListener('click', () => {
+            try {
+                if (!validateShippingForm() || !validatePaymentForm()) {
+                return;
+            }
+
+                const shippingData = JSON.parse(localStorage.getItem('shippingData')) || {};
+                const paymentData = JSON.parse(localStorage.getItem('paymentData')) || {};
+                const cart = JSON.parse(localStorage.getItem('cart')) || [];
+                const subtotal = calculateSubtotal();
+                const shipping = document.getElementById('shipping').textContent === 'Free' ? 0 : 99;
+                const tax = Math.round(subtotal * 0.05);
+                const discount = promoDiscount.style.display === 'flex' ? 
+                    parseInt(discountAmount.textContent.replace('-₹', '')) : 0;
+                const total = subtotal + shipping + tax - discount;
+
+                const orderData = {
+                    orderNumber: 'ORD' + Math.floor(100000 + Math.random() * 900000),
+                    orderDate: new Date().toISOString(),
+                    shipping: shippingData,
+                    payment: paymentData,
+                    items: cart,
+                    summary: {
+                        subtotal: subtotal,
+                        shipping: shipping,
+                        tax: tax,
+                        discount: discount,
+                        total: total
+                    }
+                };
+
+                localStorage.setItem('orderData', JSON.stringify(orderData));
+
+            const button = document.getElementById('placeOrderBtn');
+            const originalText = button.innerHTML;
+            button.disabled = true;
+            button.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Processing...';
+
+            setTimeout(() => {
+                localStorage.removeItem('cart');
+                    localStorage.removeItem('checkoutFormData');
+                window.location.href = 'order-confirmation.html';
+            }, 1500);
+
+            } catch (error) {
+                console.error('Error in place order:', error);
+                showError(document.getElementById('placeOrderBtn'), 'An error occurred. Please try again.');
+            }
+        });
+
+        // Real-time validation
+        document.querySelectorAll('#shippingForm input, #shippingForm select').forEach(input => {
+            input.addEventListener('blur', () => {
+                if (input.hasAttribute('required') && !input.value.trim()) {
+                    showError(input, `${input.previousElementSibling.textContent.trim()} is required`);
+                } else if (input.type === 'email' && input.value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input.value)) {
+                    showError(input, 'Please enter a valid email address');
+                } else if (input.type === 'tel' && input.value && !/^[0-9]{10}$/.test(input.value)) {
+                    showError(input, 'Please enter a valid 10-digit phone number');
+                } else if (input.pattern === '[0-9]{6}' && input.value && !/^[0-9]{6}$/.test(input.value)) {
+                    showError(input, 'Please enter a valid 6-digit postal code');
+                }
+            });
+        });
+
+        // Saved address handling
+        document.getElementById('savedAddressCheck').addEventListener('change', function() {
+            const savedAddresses = document.getElementById('savedAddresses');
+            const shippingForm = document.getElementById('shippingForm');
+            
+            if (this.checked) {
+                const savedData = JSON.parse(localStorage.getItem('shippingData')) || {};
+                if (Object.keys(savedData).length === 0) {
+                    showError(this, 'No saved address found');
+                    this.checked = false;
+                    return;
+                }
+                
+                savedAddresses.style.display = 'block';
+                shippingForm.style.display = 'none';
+                
+                document.getElementById('savedAddressName').textContent = 
+                    `${savedData.firstName || ''} ${savedData.lastName || ''}`.trim();
+                document.getElementById('savedAddressLine1').textContent = savedData.address1 || '';
+                document.getElementById('savedAddressLine2').textContent = 
+                    `${savedData.address2 || ''} ${savedData.city || ''}, ${savedData.state || ''} ${savedData.postalCode || ''}`.trim();
+                document.getElementById('savedAddressPhone').textContent = 
+                    savedData.phone ? `Phone: +91 ${savedData.phone}` : '';
+            } else {
+                savedAddresses.style.display = 'none';
+                shippingForm.style.display = 'block';
+            }
+        });
+
+        // Payment method selection
+        document.querySelectorAll('.payment-method').forEach(method => {
+            method.addEventListener('click', () => {
+                document.querySelectorAll('.payment-method').forEach(m => m.classList.remove('selected'));
+                method.classList.add('selected');
+                
+                const methodType = method.dataset.method;
+                document.querySelectorAll('[id$="Form"]').forEach(form => {
+                    form.style.display = 'none';
+                });
+                
+                if (methodType === 'card') {
+                    document.getElementById('cardForm').style.display = 'block';
+                    document.getElementById('savedCards').style.display = 'block';
+                } else {
+                    document.getElementById(`${methodType}Form`).style.display = 'block';
+                }
+            });
+        });
+    </script>
+</body>
+</html>

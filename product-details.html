@@ -1,0 +1,1072 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Details - Sonata</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <style>
+        /* Core styles */
+        :root {
+            --primary-color: #1a1a1a;
+            --accent-color: #dc3545;
+            --gold: #ffd700;
+            --light-bg: #f8f9fa;
+            --border-radius: 8px;
+            --box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            
+            /* Font Weights */
+            --font-light: 300;
+            --font-regular: 400;
+            --font-medium: 500;
+            --font-semibold: 600;
+            --font-bold: 700;
+            --font-extrabold: 800;
+        }
+
+        body {
+            background-color: var(--light-bg);
+            font-family: 'Poppins', sans-serif;
+            font-weight: var(--font-regular);
+            color: var(--primary-color);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            padding: 15px;
+        }
+
+        /* Product Gallery */
+        .product-gallery {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 15px;
+            margin-bottom: 20px;
+            box-shadow: var(--box-shadow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .product-image-main {
+            height: 400px;
+            margin-bottom: 10px;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .product-image-main img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            transition: transform 0.3s ease;
+        }
+
+        .product-image-main:hover img {
+            transform: scale(1.05);
+        }
+
+        /* Product Info */
+        .product-info {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: var(--box-shadow);
+        }
+
+        .product-category {
+            display: inline-block;
+            padding: 5px 15px;
+            background: var(--accent-color);
+            color: white;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: var(--font-semibold);
+        }
+
+        .product-title {
+            font-size: 2.25rem;
+            font-weight: var(--font-bold);
+            color: var(--primary-color);
+            margin-bottom: 10px;
+            line-height: 1.2;
+            letter-spacing: -0.5px;
+        }
+
+        .product-price {
+            font-size: 2.5rem;
+            font-weight: var(--font-bold);
+            color: var(--accent-color);
+            margin: 15px 0;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .price-currency {
+            font-weight: var(--font-medium);
+        }
+
+        /* Quantity Control */
+        .quantity-control {
+            background: var(--light-bg);
+            border-radius: var(--border-radius);
+            padding: 10px;
+            margin: 15px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .quantity-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: none;
+            background: white;
+            color: var(--primary-color);
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: var(--box-shadow);
+        }
+
+        .quantity-btn:hover {
+            background: var(--accent-color);
+            color: white;
+        }
+
+        .quantity-input {
+            width: 60px;
+            height: 40px;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            text-align: center;
+            font-size: 1.1rem;
+            font-weight: var(--font-medium);
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .btn-add-cart, .btn-buy-now {
+            flex: 1;
+            padding: 12px 20px;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-weight: var(--font-semibold);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.2s ease;
+        }
+
+        .btn-add-cart {
+            background: var(--accent-color);
+            color: white;
+            border: none;
+        }
+
+        .btn-buy-now {
+            background: white;
+            color: var(--accent-color);
+            border: 2px solid var(--accent-color);
+        }
+
+        .btn-add-cart:hover, .btn-buy-now:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--box-shadow);
+        }
+
+        /* Features Section */
+        .features-section {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 20px;
+            margin-top: 20px;
+            box-shadow: var(--box-shadow);
+        }
+
+        .feature-card {
+            text-align: center;
+            padding: 15px;
+            transition: all 0.2s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-3px);
+        }
+
+        .feature-icon {
+            font-size: 2rem;
+            color: var(--accent-color);
+            margin-bottom: 10px;
+        }
+
+        .feature-card h6 {
+            font-weight: var(--font-semibold);
+            font-size: 1.1rem;
+            margin: 12px 0 8px;
+        }
+
+        .feature-card p {
+            font-weight: var(--font-regular);
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        /* Product Tabs */
+        .nav-tabs {
+            border-bottom: 2px solid #dee2e6;
+            margin-bottom: 0;
+        }
+
+        .nav-tabs .nav-link {
+            border: none;
+            color: #666;
+            font-weight: var(--font-medium);
+            padding: 10px 20px;
+            margin-right: 5px;
+            transition: all 0.2s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .nav-tabs .nav-link.active {
+            color: var(--accent-color);
+            border-bottom: 2px solid var(--accent-color);
+            font-weight: var(--font-semibold);
+        }
+
+        .tab-content {
+            background: white;
+            border-radius: 0 0 var(--border-radius) var(--border-radius);
+            padding: 20px;
+            box-shadow: var(--box-shadow);
+        }
+
+        /* Specifications Table */
+        .specs-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0 8px;
+        }
+
+        .specs-table tr {
+            background: var(--light-bg);
+            border-radius: var(--border-radius);
+        }
+
+        .specs-table th,
+        .specs-table td {
+            padding: 12px 15px;
+        }
+
+        .specs-table th {
+            width: 35%;
+            color: var(--primary-color);
+            font-weight: var(--font-semibold);
+            font-size: 1.05rem;
+        }
+
+        .specs-table td {
+            font-weight: var(--font-regular);
+            font-size: 1rem;
+        }
+
+        /* Reviews Section */
+        .review-card {
+            background: var(--light-bg);
+            border-radius: var(--border-radius);
+            padding: 15px;
+            margin-bottom: 15px;
+            transition: all 0.2s ease;
+        }
+
+        .rating {
+            color: var(--gold);
+            font-size: 1rem;
+        }
+
+        .review-card h6 {
+            font-weight: var(--font-semibold);
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+        }
+
+        .review-card .date {
+            font-weight: var(--font-light);
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .review-card p {
+            font-weight: var(--font-regular);
+            font-size: 1rem;
+            line-height: 1.6;
+            margin-top: 10px;
+        }
+
+        /* Similar Products */
+        .similar-products {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 20px;
+            margin-top: 20px;
+            box-shadow: var(--box-shadow);
+        }
+
+        .similar-products h3 {
+            font-weight: var(--font-bold);
+            font-size: 1.75rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .similar-product-card {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 15px;
+            text-align: center;
+            transition: all 0.2s ease;
+            border: 1px solid #eee;
+        }
+
+        .similar-product-card:hover {
+            box-shadow: var(--box-shadow);
+        }
+
+        .similar-product-card img {
+            height: 150px;
+            object-fit: contain;
+            margin-bottom: 10px;
+        }
+
+        .similar-product-card h6 {
+            font-weight: var(--font-semibold);
+            font-size: 1rem;
+            margin: 12px 0 8px;
+        }
+
+        .similar-product-card .price {
+            font-weight: var(--font-bold);
+            font-size: 1.1rem;
+            color: var(--accent-color);
+        }
+
+        /* Wishlist Button */
+        .wishlist-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: white;
+            border: none;
+            box-shadow: var(--box-shadow);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: var(--accent-color);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            z-index: 10;
+        }
+
+        .wishlist-btn:hover,
+        .wishlist-btn.active {
+            background: var(--accent-color);
+            color: white;
+        }
+
+        /* Toast Message */
+        .toast-message {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            padding: 12px 25px;
+            border-radius: 25px;
+            box-shadow: var(--box-shadow);
+            z-index: 1000;
+            animation: slideIn 0.3s ease;
+            font-weight: var(--font-medium);
+            font-size: 1rem;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); }
+            to { transform: translateX(0); }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .product-image-main {
+                height: 300px;
+            }
+            
+            .product-title {
+                font-size: 1.75rem;
+            }
+            
+            .product-price {
+                font-size: 2rem;
+            }
+            
+            .feature-card {
+                padding: 10px;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+            
+            .similar-product-card img {
+                height: 120px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg bg-white shadow-sm px-4 py-2">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="index.html">
+                <img src="https://www.sonatawatches.in/on/demandware.static/-/Library-Sites-SonataSharedLibrary/default/dw03b590d6/images/sonataLogo.svg"
+                    alt="Sonata Logo" style="height: 30px; width: auto;" />
+            </a>
+            <div class="top-icons d-flex align-items-center ms-auto gap-3">
+                <a href="login.html" class="text-dark text-decoration-none">
+                    <i class="bi bi-person fs-5"></i>
+                </a>
+                <a href="wishlist.html" class="text-dark text-decoration-none">
+                    <i class="bi bi-heart fs-5"></i>
+                </a>
+                <a href="cart.html" class="text-dark text-decoration-none position-relative">
+                    <i class="bi bi-bag fs-5"></i>
+                    <span class="cart-count" id="cartCount">0</span>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container my-5">
+        <div class="row g-4">
+            <!-- Product Gallery -->
+            <div class="col-lg-6" data-aos="fade-right">
+                <div class="product-gallery">
+                    <div class="product-image-main">
+                        <img id="productImage" src="" alt="Product Image">
+                        <div class="image-overlay"></div>
+                    </div>
+                    <button class="wishlist-btn" id="wishlistBtn">
+                        <i class="bi bi-heart"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Product Info -->
+            <div class="col-lg-6" data-aos="fade-left">
+                <div class="product-info">
+                    <span class="product-category" id="productCategory"></span>
+                    <h1 class="product-title" id="productName"></h1>
+                    <div class="product-price">
+                        <span class="price-currency">₹</span>
+                        <span id="productPrice"></span>
+                    </div>
+                    <p class="lead mb-4" id="productDescription"></p>
+
+                    <!-- Quantity Control -->
+                    <div class="quantity-control">
+                        <button class="quantity-btn" id="decreaseQuantity">-</button>
+                        <input type="number" class="quantity-input" id="quantity" value="1" min="1" readonly>
+                        <button class="quantity-btn" id="increaseQuantity">+</button>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="action-buttons">
+                        <button class="btn btn-add-cart" id="addToCart">
+                            <i class="bi bi-cart-plus me-2"></i>Add to Cart
+                        </button>
+                        <button class="btn btn-buy-now" id="buyNow">Buy Now</button>
+                    </div>
+                </div>
+
+                <!-- Product Features -->
+                <div class="features-section mt-4" data-aos="fade-up">
+                    <div class="row g-4">
+                        <div class="col-4">
+                            <div class="feature-card">
+                                <i class="bi bi-shield-check feature-icon"></i>
+                                <h6>1 Year Warranty</h6>
+                                <p class="small text-muted">Manufacturer warranty</p>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="feature-card">
+                                <i class="bi bi-truck feature-icon"></i>
+                                <h6>Free Shipping</h6>
+                                <p class="small text-muted">On all orders</p>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="feature-card">
+                                <i class="bi bi-arrow-return-left feature-icon"></i>
+                                <h6>Easy Returns</h6>
+                                <p class="small text-muted">30 days policy</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Product Details Tabs -->
+        <div class="row mt-5">
+            <div class="col-12">
+                <ul class="nav nav-tabs" id="productTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#description">
+                            Description
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#specifications">
+                            Specifications
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#reviews">
+                            Reviews
+                        </button>
+                    </li>
+                </ul>
+
+                <div class="tab-content p-4 border border-top-0 rounded-bottom">
+                    <div class="tab-pane fade show active" id="description">
+                        <p class="lead" id="productFullDescription"></p>
+                    </div>
+                    <div class="tab-pane fade" id="specifications">
+                        <table class="specs-table">
+                            <tr>
+                                <th>Brand</th>
+                                <td>Sonata</td>
+                            </tr>
+                            <tr>
+                                <th>Model Number</th>
+                                <td id="modelNumber"></td>
+                            </tr>
+                            <tr>
+                                <th>Style</th>
+                                <td id="style"></td>
+                            </tr>
+                            <tr>
+                                <th>Water Resistance</th>
+                                <td>30 meters</td>
+                            </tr>
+                            <tr>
+                                <th>Warranty</th>
+                                <td>1 Year</td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="tab-pane fade" id="reviews">
+                        <div class="d-flex align-items-center mb-4">
+                            <h4 class="mb-0 me-3">4.5</h4>
+                            <div class="rating">
+                                <i class="bi bi-star-fill"></i>
+                                <i class="bi bi-star-fill"></i>
+                                <i class="bi bi-star-fill"></i>
+                                <i class="bi bi-star-fill"></i>
+                                <i class="bi bi-star-half"></i>
+                            </div>
+                            <span class="ms-2">(120 reviews)</span>
+                        </div>
+                        <div class="review-card">
+                            <div class="d-flex justify-content-between mb-2">
+                                <h6>John Doe</h6>
+                                <small class="text-muted">2 days ago</small>
+                            </div>
+                            <div class="rating mb-2">
+                                <i class="bi bi-star-fill"></i>
+                                <i class="bi bi-star-fill"></i>
+                                <i class="bi bi-star-fill"></i>
+                                <i class="bi bi-star-fill"></i>
+                                <i class="bi bi-star-fill"></i>
+                            </div>
+                            <p>Great watch! The quality is excellent and it looks even better in person.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Similar Products -->
+        <div class="similar-products mt-5" data-aos="fade-up">
+            <h3 class="mb-4">You May Also Like</h3>
+            <div class="row g-4" id="similarProducts">
+                <!-- Similar products will be dynamically added here -->
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        // Initialize AOS
+        AOS.init({
+            duration: 800,
+            once: true
+        });
+
+        // Define products array (same as in index.html)
+        const products = [
+            {
+                id: 1, name: "Men's Blue Watch", price: 1595, category: "Men", img: "https://www.sonatawatches.in/dw/image/v2/BKDD_PRD/on/demandware.static/-/Sites-titan-master-catalog/default/dwd3651491/images/Sonata/Catalog/SP70050SP01_1.jpg?sw=360&sh=360", shortDesc: "Elegant and bold.",
+                fullDesc: "This Royal Black Watch is crafted with a stainless steel body, sapphire glass, and a leather strap. Perfect for any occasion."
+            },
+            {
+                id: 2, name: "Women's Rose Gold", price: 1799, category: "Women", img: "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcSSOtKnzqNbmOUn0s704JKFfsQzjt2NzFDXd07eYex7Ww495tdz-egU4pI_h6aPsb0CJjE-oMtLJH0rM0zJVe1xlRKRwVrHOeisRsHYfVmz", shortDesc: "Elegant and bold.",
+                fullDesc: "This Royal Black Watch is crafted with a stainless steel body, sapphire glass, and a leather strap. Perfect for any occasion."
+            },
+            {
+                id: 3, name: "Couple Gold Set", price: 3499, category: "Couple", img: "https://www.sonatawatches.in/dw/image/v2/BKDD_PRD/on/demandware.static/-/Sites-titan-master-catalog/default/dw179563cb/images/Sonata/Catalog/7710587041YM01_1.jpg?sw=600&sh=600", shortDesc: "Elegant and bold.",
+                fullDesc: "This Royal Black Watch is crafted with a stainless steel body, sapphire glass, and a leather strap. Perfect for any occasion."
+            },
+            {
+                id: 4, name: "Men's Green Dial", price: 999, category: "Men", img: "https://www.sonatawatches.in/dw/image/v2/BKDD_PRD/on/demandware.static/-/Sites-titan-master-catalog/default/dw773e1744/images/Sonata/Catalog/77145YM01_1.jpg?sw=600&sh=600", shortDesc: "Elegant and bold.",
+                fullDesc: "This Royal Black Watch is crafted with a stainless steel body, sapphire glass, and a leather strap. Perfect for any occasion."
+            },
+            {
+                id: 5, name: "Women's Slim Strap", price: 1099, category: "Women", img: "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcRJAM2CGDGiyzDRqF_Q5255_FWx7HtZ_vjxannFfV_-hC5nx61k-SuoADnfeSOjKe-R-tm2wW-CAtK9_d8HRbHM0fn5Cx7RQvXTxIeCNxk_XAI6MQvnewCZ6g", shortDesc: "Elegant and bold.",
+                fullDesc: "This Royal Black Watch is crafted with a stainless steel body, sapphire glass, and a leather strap. Perfect for any occasion."
+            },
+            {
+                id: 6, name: "Couple Classic", price: 2899, category: "Couple", img: "https://www.sonatawatches.in/dw/image/v2/BKDD_PRD/on/demandware.static/-/Sites-titan-master-catalog/default/dw37bad778/images/Sonata/Catalog/7712887047YL02_1.jpg?sw=600&sh=600", shortDesc: "Elegant and bold.",
+                fullDesc: "This Royal Black Watch is crafted with a stainless steel body, sapphire glass, and a leather strap. Perfect for any occasion."
+            },
+            {
+                id: 7, name: "Men's Chronograph", price: 2299, category: "Men", img: "https://www.sonatawatches.in/dw/image/v2/BKDD_PRD/on/demandware.static/-/Sites-titan-master-catalog/default/dw44dbd9e0/images/Sonata/Catalog/77139SL02_1.jpg?sw=600&sh=600", shortDesc: "Elegant and bold.",
+                fullDesc: "This Royal Black Watch is crafted with a stainless steel body, sapphire glass, and a leather strap. Perfect for any occasion."
+            },
+            {
+                id: 8, name: "Women's Silver Dial", price: 1199, category: "Women", img: "https://www.sonatawatches.in/dw/image/v2/BKDD_PRD/on/demandware.static/-/Sites-titan-master-catalog/default/dw50655959/images/Sonata/Catalog/8141KM02_1.jpg?sw=600&sh=600", shortDesc: "Elegant and bold.",
+                fullDesc: "This Royal Black Watch is crafted with a stainless steel body, sapphire glass, and a leather strap. Perfect for any occasion."
+            },
+            {
+                id: 9, name: "Sonata Poze Quartz Analog White", price: 945, category: "Men", img: "https://www.sonatawatches.in/dw/image/v2/BKDD_PRD/on/demandware.static/-/Sites-titan-master-catalog/default/dwf17fba01/images/Sonata/Catalog/SP70029WL01W_1.jpg?sw=600&sh=600", shortDesc: "Elegant and bold.",
+                fullDesc: "This Royal Black Watch is crafted with a stainless steel body, sapphire glass, and a leather strap. Perfect for any occasion."
+            },
+            {
+                id: 10, name: "Couple Premium", price: 3799, category: "Couple", img: "https://www.sonatawatches.in/dw/image/v2/BKDD_PRD/on/demandware.static/-/Sites-titan-master-catalog/default/dw53970d8f/images/Sonata/Catalog/7712787046YP01_1.jpg?sw=600&sh=600", shortDesc: "Elegant and bold.",
+                fullDesc: "This Royal Black Watch is crafted with a stainless steel body, sapphire glass, and a leather strap. Perfect for any occasion."
+            },
+            {
+                id: 11, name: "Sonata Poze Quartz", price: 945, category: "Men", img: "https://www.sonatawatches.in/dw/image/v2/BKDD_PRD/on/demandware.static/-/Sites-titan-master-catalog/default/dw8f232cb4/images/Sonata/Catalog/SP70027WL02W_1.jpg?sw=600&sh=600", shortDesc: "Elegant and bold.",
+                fullDesc: "This Royal Black Watch is crafted with a stainless steel body, sapphire glass, and a leather strap. Perfect for any occasion."
+            },
+            {
+                id: 12, name: "Sonata Quartz Analog Black Dial", price: 1975, category: "Couple", img: "https://www.sonatawatches.in/dw/image/v2/BKDD_PRD/on/demandware.static/-/Sites-titan-master-catalog/default/dw8b53f7a0/images/Sonata/Catalog/7710587041NL01_1.jpg?sw=600&sh=600", shortDesc: "Elegant and bold.",
+                fullDesc: "This Royal Black Watch is crafted with a stainless steel body, sapphire glass, and a leather strap. Perfect for any occasion."
+            },
+            {
+                id: 13, name: "Sonata Wedding Premium", price: 3945, category: "Men", img: "https://www.sonatawatches.in/dw/image/v2/BKDD_PRD/on/demandware.static/-/Sites-titan-master-catalog/default/dw8e41a7ea/images/Sonata/Catalog/77146WL01_1.jpg?sw=600&sh=600", shortDesc: "Elegant and bold.",
+                fullDesc: "This Royal Black Watch is crafted with a stainless steel body, sapphire glass, and a leather strap. Perfect for any occasion."
+            },
+            {
+                id: 14, name: "Sonata Quartz Analog Silver Dial", price: 2975, category: "Couple", img: "https://www.sonatawatches.in/dw/image/v2/BKDD_PRD/on/demandware.static/-/Sites-titan-master-catalog/default/dw99206391/images/Sonata/Catalog/71178137BM01_1.jpg?sw=600&sh=600", shortDesc: "Elegant and bold.",
+                fullDesc: "This Royal Black Watch is crafted with a stainless steel body, sapphire glass, and a leather strap. Perfect for any occasion."
+            },
+            {
+                id: 15, name: "Couple Premium", price: 3799, category: "Couple", img: "https://www.sonatawatches.in/dw/image/v2/BKDD_PRD/on/demandware.static/-/Sites-titan-master-catalog/default/dw53970d8f/images/Sonata/Catalog/7712787046YP01_1.jpg?sw=600&sh=600", shortDesc: "Elegant and bold.",
+                fullDesc: "This Royal Black Watch is crafted with a stainless steel body, sapphire glass, and a leather strap. Perfect for any occasion."
+            },
+            {
+                id: 16, name: "Sonata Wedding Edit Quartz Analog", price: 2895, category: "Couple", img: "https://www.sonatawatches.in/dw/image/v2/BKDD_PRD/on/demandware.static/-/Sites-titan-master-catalog/default/dw336367be/images/Sonata/Catalog/7716987088WM01_1.jpg?sw=600&sh=600", shortDesc: "Elegant and bold.",
+                fullDesc: "This Royal Black Watch is crafted with a stainless steel body, sapphire glass, and a leather strap. Perfect for any occasion."
+            },
+            {
+                id: 17, name: "Sonata Pair Quartz Analog Champagne Dial Stainless Steel Strap", price: 3795, category: "Couple", img: "https://www.sonatawatches.in/dw/image/v2/BKDD_PRD/on/demandware.static/-/Sites-titan-master-catalog/default/dwb7a6067d/images/Sonata/Catalog/7710587050YM01_1.jpg?sw=600&sh=600", shortDesc: "Elegant and bold.",
+                fullDesc: "This Royal Black Watch is crafted with a stainless steel body, sapphire glass, and a leather strap. Perfect for any occasion."
+            },
+            {
+                id: 18, name: "Sonata Pairs Quartz Analog Silver Dial Leather Strap", price: 1705, category: "Couple", img: "https://www.sonatawatches.in/dw/image/v2/BKDD_PRD/on/demandware.static/-/Sites-titan-master-catalog/default/dw3e64b4a6/images/Sonata/Catalog/7712887047SL01_1.jpg?sw=600&sh=600", shortDesc: "Elegant and bold.",
+                fullDesc: "This Royal Black Watch is crafted with a stainless steel body, sapphire glass, and a leather strap. Perfect for any occasion."
+            },
+            {
+                id: 19, name: "Sonata Alloy Pairs Quartz Analog Brown Stainless", price: 3695, category: "Couple", img: "https://www.sonatawatches.in/dw/image/v2/BKDD_PRD/on/demandware.static/-/Sites-titan-master-catalog/default/dwf32948e7/images/Sonata/Catalog/7712887047YM01_1.jpg?sw=600&sh=600", shortDesc: "Elegant and bold.",
+                fullDesc: "This Royal Black Watch is crafted with a stainless steel body, sapphire glass, and a leather strap. Perfect for any occasion."
+            },
+            {
+                id: 20, name: "Sonata Quartz Analog Premium", price: 1895, category: "Men", img: "https://www.sonatawatches.in/dw/image/v2/BKDD_PRD/on/demandware.static/-/Sites-titan-master-catalog/default/dwa50f8711/images/Sonata/Catalog/77149SM02_1.jpg?sw=600&sh=600", shortDesc: "Elegant and bold.",
+                fullDesc: "This Royal Black Watch is crafted with a stainless steel body, sapphire glass, and a leather strap. Perfect for any occasion."
+            },
+            {
+                id: 21, name: "Sonata Poze Quartz Analog", price: 945, category: "Men", img: "https://www.sonatawatches.in/dw/image/v2/BKDD_PRD/on/demandware.static/-/Sites-titan-master-catalog/default/dw0ba8497d/images/Sonata/Catalog/SP70027SL01W_1.jpg?sw=600&sh=600", shortDesc: "Elegant and bold.",
+                fullDesc: "This Royal Black Watch is crafted with a stainless steel body, sapphire glass, and a leather strap. Perfect for any occasion."
+            },
+            {
+                id: 22, name: "Sonata Hexa Digital Black Dial", price: 1895, category: "Men", img: "https://www.sonatawatches.in/dw/image/v2/BKDD_PRD/on/demandware.static/-/Sites-titan-master-catalog/default/dw33aaf340/images/Sonata/Catalog/77134PM05W_1.jpg?sw=600&sh=600", shortDesc: "Elegant and bold.",
+                fullDesc: "This Royal Black Watch is crafted with a stainless steel body, sapphire glass, and a leather strap. Perfect for any occasion."
+            },
+            {
+                id: 23, name: "Sonata Wedding Edit Quartz Analog Purple", price: 3095, category: "Women", img: "https://www.sonatawatches.in/dw/image/v2/BKDD_PRD/on/demandware.static/-/Sites-titan-master-catalog/default/dw12e083c8/images/Sonata/Catalog/87060QM02W_1.jpg?sw=600&sh=600", shortDesc: "Elegant and bold.",
+                fullDesc: "This Royal Black Watch is crafted with a stainless steel body, sapphire glass, and a leather strap. Perfect for any occasion."
+            },
+            {
+                id: 24, name: "Sonata Poze Quartz Analog Grey Dial Leather", price: 1095, category: "Women", img: "https://www.sonatawatches.in/dw/image/v2/BKDD_PRD/on/demandware.static/-/Sites-titan-master-catalog/default/dw3d09a367/images/Sonata/Catalog/SP80092WL01_1.jpg?sw=600&sh=600", shortDesc: "Elegant and bold.",
+                fullDesc: "This Royal Black Watch is crafted with a stainless steel body, sapphire glass, and a leather strap. Perfect for any occasion."
+            },
+            {
+                id: 25, name: "Sonata Poze Quartz Analog Silver Dial Metal Strap", price: 1795, category: "Women", img: "https://www.sonatawatches.in/dw/image/v2/BKDD_PRD/on/demandware.static/-/Sites-titan-master-catalog/default/dw70dcc8e6/images/Sonata/Catalog/SP80105WM01_1.jpg?sw=600&sh=600", shortDesc: "Elegant and bold.",
+                fullDesc: "This Royal Black Watch is crafted with a stainless steel body, sapphire glass, and a leather strap. Perfect for any occasion."
+            },
+            {
+                id: 26, name: "Sonata Quartz Analog Mother of Pearl Dial Two Toned", price: 2995, category: "Women", img: "https://www.sonatawatches.in/dw/image/v2/BKDD_PRD/on/demandware.static/-/Sites-titan-master-catalog/default/dwdb2223b8/images/Sonata/Catalog/87064KD02_1.jpg?sw=600&sh=600", shortDesc: "Elegant and bold.",
+                fullDesc: "This Royal Black Watch is crafted with a stainless steel body, sapphire glass, and a leather strap. Perfect for any occasion."
+            },
+            {
+                id: 27, name: "Sonata Silver Lining Blue Dial Women Watch", price: 1695, category: "Women", img: "https://www.sonatawatches.in/dw/image/v2/BKDD_PRD/on/demandware.static/-/Sites-titan-master-catalog/default/dw93b5a8d5/images/Sonata/Catalog/8141SM10_1.jpg?sw=600&sh=600", shortDesc: "Elegant and bold.",
+                fullDesc: "This Royal Black Watch is crafted with a stainless steel body, sapphire glass, and a leather strap. Perfect for any occasion."
+            },
+            {
+                id: 28, name: "Sonata Quartz Analog Grey Dial Grey Leather", price: 1995, category: "Women", img: "https://www.sonatawatches.in/dw/image/v2/BKDD_PRD/on/demandware.static/-/Sites-titan-master-catalog/default/dw550c5a64/images/Sonata/Catalog/87070WL01_1.jpg?sw=600&sh=600", shortDesc: "Elegant and bold.",
+                fullDesc: "This Royal Black Watch is crafted with a stainless steel body, sapphire glass, and a leather strap. Perfect for any occasion."
+            },
+            {
+                id: 29, name: "Sonata Pankh Champagne Dial Women Watch", price: 1375, category: "Women", img: "https://www.sonatawatches.in/dw/image/v2/BKDD_PRD/on/demandware.static/-/Sites-titan-master-catalog/default/dw10332607/images/Sonata/Catalog/8085YM05_1.jpg?sw=600&sh=600", shortDesc: "Elegant and bold.",
+                fullDesc: "This Royal Black Watch is crafted with a stainless steel body, sapphire glass, and a leather strap. Perfect for any occasion."
+            },
+            {
+                id: 30, name: "Sonata Play Pink Dial Women Watch With Plastic Strap", price: 695, category: "Women", img: "https://www.sonatawatches.in/dw/image/v2/BKDD_PRD/on/demandware.static/-/Sites-titan-master-catalog/default/dw9c086e1f/images/Sonata/Catalog/8992PP10W_1.jpg?sw=600&sh=600", shortDesc: "Elegant and bold.",
+                fullDesc: "This Royal Black Watch is crafted with a stainless steel body, sapphire glass, and a leather strap. Perfect for any occasion."
+            },
+            {
+                id: 31, name: "Sonata Workwear White Dial Women Watch With Stainless Steel Strap", price: 1195, category: "Women", img: "https://www.sonatawatches.in/dw/image/v2/BKDD_PRD/on/demandware.static/-/Sites-titan-master-catalog/default/dwd639b3a5/images/Sonata/Catalog/8151SM05_1.jpg?sw=600&sh=600", shortDesc: "Elegant and bold.",
+                fullDesc: "This Royal Black Watch is crafted with a stainless steel body, sapphire glass, and a leather strap. Perfect for any occasion."
+            },
+            {
+                id: 32, name: "Sonata Hexa Digital Black Dial", price: 1195, category: "Women", img: "https://www.sonatawatches.in/dw/image/v2/BKDD_PRD/on/demandware.static/-/Sites-titan-master-catalog/default/dw62596a06/images/Sonata/Catalog/8080SM01_1.jpg?sw=600&sh=600", shortDesc: "Elegant and bold.",
+                fullDesc: "This Royal Black Watch is crafted with a stainless steel body, sapphire glass, and a leather strap. Perfect for any occasion."
+            },
+            {
+                id: 33, name: "Sonata Quartz Analog Black Dial Metal Strap Watch for Women", price: 1575, category: "Women", img: "https://www.sonatawatches.in/dw/image/v2/BKDD_PRD/on/demandware.static/-/Sites-titan-master-catalog/default/dwb27dfd9b/images/Sonata/Catalog/8048YM03_1.jpg?sw=600&sh=600", shortDesc: "Elegant and bold.",
+                fullDesc: "This Royal Black Watch is crafted with a stainless steel body, sapphire glass, and a leather strap. Perfect for any occasion."
+            },
+            {
+                id: 34, name: "Sonata Wedding Rose Gold Dial Women Watch With Stainless Steel Strap", price: 2345, category: "Women", img: "https://www.sonatawatches.in/dw/image/v2/BKDD_PRD/on/demandware.static/-/Sites-titan-master-catalog/default/dw523d508e/images/Sonata/Catalog/8147WM01_1.jpg?sw=600&sh=600", shortDesc: "Elegant and bold.",
+                fullDesc: "This Royal Black Watch is crafted with a stainless steel body, sapphire glass, and a leather strap. Perfect for any occasion."
+            },
+            {
+                id: 35, name: "Sonata Wedding Edit Quartz Analog Maroon Dial Stainless Steel With Acetate Strap Watch For Women", price: 2995, category: "Women", img: "https://www.sonatawatches.in/dw/image/v2/BKDD_PRD/on/demandware.static/-/Sites-titan-master-catalog/default/dw61f92e08/images/Sonata/Catalog/87064KD05_1.jpg?sw=600&sh=600", shortDesc: "Elegant and bold.",
+                fullDesc: "This Royal Black Watch is crafted with a stainless steel body, sapphire glass, and a leather strap. Perfect for any occasion."
+            },
+            {
+                id: 36, name: "Sonata Quartz Analog Beige Dial Stainless Steel Strap Watch for Couple", price: 3845, category: "Couple", img: "https://www.sonatawatches.in/dw/image/v2/BKDD_PRD/on/demandware.static/-/Sites-titan-master-catalog/default/dw7a7a13ef/images/Sonata/Catalog/71258114YM01_1.jpg?sw=600&sh=600", shortDesc: "Elegant and bold.",
+                fullDesc: "This Royal Black Watch is crafted with a stainless steel body, sapphire glass, and a leather strap. Perfect for any occasion."
+            },
+            {
+                id: 37, name: "Sonata Alloy Pairs Quartz Analog Silver Leather Strap for Couple", price: 2999, category: "Couple", img: "https://www.sonatawatches.in/dw/image/v2/BKDD_PRD/on/demandware.static/-/Sites-titan-master-catalog/default/dw6133dcd2/images/Sonata/Catalog/7712887047YL01_1.jpg?sw=600&sh=600", shortDesc: "Elegant and bold.",
+                fullDesc: "This Royal Black Watch is crafted with a stainless steel body, sapphire glass, and a leather strap. Perfect for any occasion."
+            },
+            {
+                id: 38, name: "Camo Multicoloured Dial Plastic Strap Watch for Men", price: 775, category: "Men", img: "https://www.sonatawatches.in/dw/image/v2/BKDD_PRD/on/demandware.static/-/Sites-titan-master-catalog/default/dwfd4b4d55/images/Sonata/Catalog/77086PP11W_1.jpg?sw=600&sh=600", shortDesc: "Elegant and bold.",
+                fullDesc: "This Royal Black Watch is crafted with a stainless steel body, sapphire glass, and a leather strap. Perfect for any occasion."
+            },
+            {
+                id: 39, name: "Sonata RPM Quartz Analog with Day and Date Beige Dial Leather Strap Watch for Men", price: 749, category: "Men", img: "https://www.sonatawatches.in/dw/image/v2/BKDD_PRD/on/demandware.static/-/Sites-titan-master-catalog/default/dwc8303478/images/Sonata/Catalog/7924SL13_1.jpg?sw=600&sh=600", shortDesc: "Elegant and bold.",
+                fullDesc: "This Royal Black Watch is crafted with a stainless steel body, sapphire glass, and a leather strap. Perfect for any occasion."
+            },
+            {
+                id: 40, name: "Sonata Quartz Multifunction Black Dial Two Toned Stainless Steel Strap Watch For Men", price: 3995, category: "Men", img: "https://www.sonatawatches.in/dw/image/v2/BKDD_PRD/on/demandware.static/-/Sites-titan-master-catalog/default/dw21fb2e13/images/Sonata/Catalog/77145KM01_1.jpg?sw=600&sh=600", shortDesc: "Elegant and bold.",
+                fullDesc: "This Royal Black Watch is crafted with a stainless steel body, sapphire glass, and a leather strap. Perfect for any occasion."
+            },
+            {
+                id: 41, name: "SF Digital Dial Green Plastic Strap Watch for Men", price: 1495, category: "Men", img: "https://www.sonatawatches.in/dw/image/v2/BKDD_PRD/on/demandware.static/-/Sites-titan-master-catalog/default/dw4b5db4b8/images/Sonata/Catalog/77034PP02_1.jpg?sw=600&sh=600", shortDesc: "Elegant and bold.",
+                fullDesc: "This Royal Black Watch is crafted with a stainless steel body, sapphire glass, and a leather strap. Perfect for any occasion."
+            },
+            {
+                id: 42, name: "SF Dreamer Series Quartz Digital Analog Digital Black Round Dial Green Plastic Strap Watch For Men", price: 1499, category: "Men", img: "https://www.sonatawatches.in/dw/image/v2/BKDD_PRD/on/demandware.static/-/Sites-titan-master-catalog/default/dw940bd536/images/Sonata/Catalog/77132PP09W_1.jpg?sw=600&sh=600", shortDesc: "Elegant and bold.",
+                fullDesc: "This Royal Black Watch is crafted with a stainless steel body, sapphire glass, and a leather strap. Perfect for any occasion."
+            },
+            {
+                id: 43, name: "Sonata Wedding Edit Quartz Multifunction Blue Dial Stainless Steel Strap Watch For Men", price: 3999, category: "Men", img: "https://www.sonatawatches.in/dw/image/v2/BKDD_PRD/on/demandware.static/-/Sites-titan-master-catalog/default/dwc99411b4/images/Sonata/Catalog/77146BM01_1.jpg?sw=600&sh=600", shortDesc: "Elegant and bold.",
+                fullDesc: "This Royal Black Watch is crafted with a stainless steel body, sapphire glass, and a leather strap. Perfect for any occasion."
+            },
+            {
+                id: 44, name: "Sonata Quartz Multifunction Black Dial Black Leather Strap Watch For Men", price: 2495, category: "Men", img: "https://www.sonatawatches.in/dw/image/v2/BKDD_PRD/on/demandware.static/-/Sites-titan-master-catalog/default/dw387867f0/images/Sonata/Catalog/77139SL03_1.jpg?sw=600&sh=600", shortDesc: "Elegant and bold.",
+                fullDesc: "This Royal Black Watch is crafted with a stainless steel body, sapphire glass, and a leather strap. Perfect for any occasion."
+            },
+            {
+                id: 45, name: "SF Quartz Analog Digital Black Dial Plastic Strap Watch for Men", price: 2995, category: "Men", img: "https://www.sonatawatches.in/dw/image/v2/BKDD_PRD/on/demandware.static/-/Sites-titan-master-catalog/default/dw00ee4f88/images/Sonata/Catalog/77070PP02J_1.jpg?sw=600&sh=600", shortDesc: "Elegant and bold.",
+                fullDesc: "This Royal Black Watch is crafted with a stainless steel body, sapphire glass, and a leather strap. Perfect for any occasion."
+            },
+            {
+                id: 46, name: "Sonata Unveil Quartz Analog Silver Dial Stainless Steel Strap Watch for Men", price: 3499, category: "Men", img: "https://www.sonatawatches.in/dw/image/v2/BKDD_PRD/on/demandware.static/-/Sites-titan-master-catalog/default/dwd44dae47/images/Sonata/Catalog/7140KM02_1.jpg?sw=600&sh=600", shortDesc: "Elegant and bold.",
+                fullDesc: "This Royal Black Watch is crafted with a stainless steel body, sapphire glass, and a leather strap. Perfect for any occasion."
+            },
+            {
+                id: 47, name: "Sonata Modern Bandhan Quartz Analog Pink Dial Stainless Steel Strap Watch for Couple", price: 3395, category: "Couple", img: "https://www.sonatawatches.in/dw/image/v2/BKDD_PRD/on/demandware.static/-/Sites-titan-master-catalog/default/dw9eb6d8dd/images/Sonata/Catalog/7710587050KM02_1.jpg?sw=600&sh=600", shortDesc: "Elegant and bold.",
+                fullDesc: "This Royal Black Watch is crafted with a stainless steel body, sapphire glass, and a leather strap. Perfect for any occasion."
+            },
+            {
+                id: 48, name: "Sonata Quartz Analog with Date White Dial Leather Strap Watch for Couple", price: 2635, category: "Couple", img: "https://www.sonatawatches.in/dw/image/v2/BKDD_PRD/on/demandware.static/-/Sites-titan-master-catalog/default/dw908d5816/images/Sonata/Catalog/71338164WL01_1.jpg?sw=600&sh=600", shortDesc: "Elegant and bold.",
+                fullDesc: "This Royal Black Watch is crafted with a stainless steel body, sapphire glass, and a leather strap. Perfect for any occasion."
+            },
+            {
+                id: 49, name: "Sonata Pairs Quartz Analog Silver Dial Leather Strap Watch for Couple", price: 1705, category: "Couple", img: "https://www.sonatawatches.in/dw/image/v2/BKDD_PRD/on/demandware.static/-/Sites-titan-master-catalog/default/dw3e64b4a6/images/Sonata/Catalog/7712887047SL01_1.jpg?sw=600&sh=600", shortDesc: "Elegant and bold.",
+                fullDesc: "This Royal Black Watch is crafted with a stainless steel body, sapphire glass, and a leather strap. Perfect for any occasion."
+            },
+
+
+
+            {
+                id: 50, name: "Sonata Quartz Analog Black Dial Metal Strap Watch for Couple", price: 2065
+                , category: "Couple", img: "https://www.sonatawatches.in/dw/image/v2/BKDD_PRD/on/demandware.static/-/Sites-titan-master-catalog/default/dw8a0235eb/images/Sonata/Catalog/11418100NM01_1.jpg?sw=600&sh=600", shortDesc: "Elegant and bold.",
+                fullDesc: "This Royal Black Watch is crafted with a stainless steel body, sapphire glass, and a leather strap. Perfect for any occasion"
+            },
+
+            {
+                id: 51, name: "Sonata Poze Quartz Analog Green Dial Mesh Strap Watch for Men", price: 3065
+                , category: "Women", img: "https://www.sonatawatches.in/dw/image/v2/BKDD_PRD/on/demandware.static/-/Sites-titan-master-catalog/default/dw4de5ca46/images/Sonata/Catalog/SP70039KM04W_1.jpg?sw=600&sh=600", shortDesc: "Elegant and bold.",
+                fullDesc: "This Royal Black Watch is crafted with a stainless steel body, sapphire glass, and a leather strap. Perfect for any occasion"
+            },
+
+            {
+                id: 52, name: "Sonata Blush It Up Maroon Dial Women Watch With Stainless Steel Strap", price: 2065
+                , category: "Couple", img: "https://www.sonatawatches.in/dw/image/v2/BKDD_PRD/on/demandware.static/-/Sites-titan-master-catalog/default/dw5bec20dc/images/Sonata/Catalog/8123WM02_1.jpg?sw=600&sh=600", shortDesc: "Elegant and bold.",
+                fullDesc: "This Royal Black Watch is crafted with a stainless steel body, sapphire glass, and a leather strap. Perfect for any occasion"
+            },
+
+
+        ];
+
+        // Get product details from URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const productId = parseInt(urlParams.get('id'));
+
+        // Get product from products array
+        const product = products.find(p => p.id === productId);
+
+        if (product) {
+            // Update product details
+            document.getElementById('productImage').src = product.img;
+            document.getElementById('productName').textContent = product.name;
+            document.getElementById('productCategory').textContent = product.category;
+            document.getElementById('productPrice').textContent = `₹${product.price}`;
+            document.getElementById('productDescription').textContent = product.shortDesc;
+            document.getElementById('productFullDescription').textContent = product.fullDesc;
+            document.getElementById('modelNumber').textContent = `SP${product.id}`;
+            document.getElementById('style').textContent = product.category;
+        } else {
+            // Handle case when product is not found
+            document.querySelector('.container').innerHTML = `
+                <div class="text-center py-5">
+                    <h2>Product Not Found</h2>
+                    <p class="text-muted">The requested product could not be found.</p>
+                    <a href="index.html" class="btn btn-dark mt-3">Back to Home</a>
+                </div>
+            `;
+        }
+
+        // Quantity controls
+        document.getElementById('decreaseQuantity').addEventListener('click', () => {
+            const quantityInput = document.getElementById('quantity');
+            if (quantityInput.value > 1) {
+                quantityInput.value = parseInt(quantityInput.value) - 1;
+            }
+        });
+
+        document.getElementById('increaseQuantity').addEventListener('click', () => {
+            const quantityInput = document.getElementById('quantity');
+            quantityInput.value = parseInt(quantityInput.value) + 1;
+        });
+
+        // Add to cart functionality
+        document.getElementById('addToCart').addEventListener('click', () => {
+            // Check if user is logged in
+            const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+
+            if (!isLoggedIn) {
+                if (confirm('Please login to add items to cart. Do you want to login now?')) {
+                    window.location.href = 'login.html';
+                }
+                return;
+            }
+
+            const quantity = parseInt(document.getElementById('quantity').value);
+            addToCart(product, quantity);
+            updateCartCount();
+
+            // Show success message
+            const successMsg = document.createElement('div');
+            successMsg.className = 'toast-message position-fixed top-0 start-50 translate-middle-x mt-3';
+            successMsg.style.zIndex = '1000';
+            successMsg.textContent = 'Item added to cart successfully!';
+            document.body.appendChild(successMsg);
+
+            // Remove message after 3 seconds
+            setTimeout(() => {
+                successMsg.remove();
+            }, 3000);
+        });
+
+        // Buy now functionality
+        document.getElementById('buyNow').addEventListener('click', () => {
+            // Check if user is logged in
+            const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+
+            if (!isLoggedIn) {
+                if (confirm('Please login to proceed with checkout. Do you want to login now?')) {
+                    window.location.href = 'login.html';
+                }
+                return;
+            }
+
+            const quantity = parseInt(document.getElementById('quantity').value);
+            addToCart(product, quantity);
+            window.location.href = 'checkout.html';
+        });
+
+        // Wishlist functionality
+        document.getElementById('wishlistBtn').addEventListener('click', function () {
+            const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+
+            if (!isLoggedIn) {
+                if (confirm('Please login to add items to wishlist. Do you want to login now?')) {
+                    window.location.href = 'login.html';
+                }
+                return;
+            }
+
+            let wishlist = JSON.parse(localStorage.getItem('wishlist')) || [];
+            const isInWishlist = wishlist.some(item => item.id === product.id);
+
+            if (isInWishlist) {
+                // Remove from wishlist
+                wishlist = wishlist.filter(item => item.id !== product.id);
+                this.classList.remove('active');
+                alert('Removed from wishlist!');
+            } else {
+                // Add to wishlist
+                wishlist.push({
+                    id: product.id,
+                    name: product.name,
+                    price: product.price,
+                    img: product.img,
+                    category: product.category
+                });
+                this.classList.add('active');
+                alert('Added to wishlist!');
+            }
+
+            localStorage.setItem('wishlist', JSON.stringify(wishlist));
+        });
+
+        // Check if product is in wishlist on page load
+        document.addEventListener('DOMContentLoaded', function () {
+            const wishlistBtn = document.getElementById('wishlistBtn');
+            const wishlist = JSON.parse(localStorage.getItem('wishlist')) || [];
+            const isInWishlist = wishlist.some(item => item.id === product.id);
+
+            if (isInWishlist) {
+                wishlistBtn.classList.add('active');
+            }
+        });
+
+        // Cart functions
+        function addToCart(product, quantity) {
+            let cart = JSON.parse(localStorage.getItem('cart')) || [];
+            const existingItem = cart.find(item => item.id === product.id);
+
+            if (existingItem) {
+                existingItem.quantity += quantity;
+            } else {
+                cart.push({
+                    id: product.id,
+                    name: product.name,
+                    price: product.price,
+                    img: product.img,
+                    quantity: quantity
+                });
+            }
+
+            localStorage.setItem('cart', JSON.stringify(cart));
+        }
+
+        function updateCartCount() {
+            const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+            if (!isLoggedIn) {
+                document.getElementById('cartCount').textContent = '0';
+                return;
+            }
+
+            const cart = JSON.parse(localStorage.getItem('cart')) || [];
+            const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+            document.getElementById('cartCount').textContent = totalItems;
+        }
+
+        // Add logout functionality
+        document.addEventListener('DOMContentLoaded', function () {
+            const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+            const userIcon = document.querySelector('.bi-person');
+
+            if (isLoggedIn) {
+                const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+                userIcon.setAttribute('title', `Logged in as ${currentUser.name}`);
+
+                // Add logout option
+                userIcon.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    if (confirm('Do you want to logout?')) {
+                        localStorage.removeItem('isLoggedIn');
+                        localStorage.removeItem('currentUser');
+                        window.location.reload();
+                    }
+                });
+            } else {
+                userIcon.setAttribute('title', 'Login');
+            }
+        });
+
+        // Show similar products
+        function showSimilarProducts() {
+            const similarProductsContainer = document.getElementById('similarProducts');
+            const similarProducts = products
+                .filter(p => p.category === product.category && p.id !== product.id)
+                .slice(0, 4);
+
+            similarProductsContainer.innerHTML = similarProducts.map(p => `
+                <div class="col-md-3 mb-4">
+                    <div class="similar-product-card">
+                        <img src="${p.img}" alt="${p.name}" class="img-fluid mb-3">
+                        <h6>${p.name}</h6>
+                        <p class="text-muted mb-2">₹${p.price}</p>
+                        <a href="product-details.html?id=${p.id}" class="btn btn-outline-dark btn-sm w-100">View Details</a>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Initialize
+        updateCartCount();
+        showSimilarProducts();
+    </script>
+</body>
+
+</html>
