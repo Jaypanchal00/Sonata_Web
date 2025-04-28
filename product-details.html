@@ -59,6 +59,7 @@
             border-radius: var(--border-radius);
             overflow: hidden;
             position: relative;
+            cursor: zoom-in;
         }
 
         .product-image-main img {
@@ -70,6 +71,39 @@
 
         .product-image-main:hover img {
             transform: scale(1.05);
+        }
+
+        /* Zoom Feature */
+        .zoom-lens {
+            position: absolute;
+            border: 2px solid var(--accent-color);
+            width: 100px;
+            height: 100px;
+            cursor: none;
+            display: none;
+            background-color: rgba(255, 255, 255, 0.2);
+            pointer-events: none;
+        }
+
+        .zoom-result {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 300px;
+            height: 300px;
+            border: 2px solid var(--accent-color);
+            background: white;
+            display: none;
+            z-index: 1000;
+            box-shadow: var(--box-shadow);
+            border-radius: var(--border-radius);
+            overflow: hidden;
+        }
+
+        .zoom-result img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
 
         /* Product Info */
@@ -115,6 +149,90 @@
 
         .price-currency {
             font-weight: var(--font-medium);
+        }
+
+        /* Product Rating */
+        .rating-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .rating-stars {
+            color: var(--gold);
+            font-size: 1.2rem;
+        }
+
+        .rating-count {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        /* Product Availability */
+        .availability-badge {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.9rem;
+            font-weight: var(--font-medium);
+            margin-bottom: 15px;
+        }
+
+        .in-stock {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .out-of-stock {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        /* Share Buttons */
+        .share-buttons {
+            display: flex;
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .share-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: none;
+            background: var(--light-bg);
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .share-btn:hover {
+            background: var(--accent-color);
+            color: white;
+        }
+
+        /* Compare Button */
+        .compare-btn {
+            background: var(--light-bg);
+            color: var(--primary-color);
+            border: none;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .compare-btn:hover {
+            background: var(--accent-color);
+            color: white;
         }
 
         /* Quantity Control */
@@ -296,11 +414,6 @@
             transition: all 0.2s ease;
         }
 
-        .rating {
-            color: var(--gold);
-            font-size: 1rem;
-        }
-
         .review-card h6 {
             font-weight: var(--font-semibold);
             font-size: 1.1rem;
@@ -413,6 +526,21 @@
             to { transform: translateX(0); }
         }
 
+        /* Recently Viewed */
+        .recently-viewed {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 20px;
+            margin-top: 20px;
+            box-shadow: var(--box-shadow);
+        }
+
+        .recently-viewed h3 {
+            font-weight: var(--font-bold);
+            font-size: 1.75rem;
+            margin-bottom: 1.5rem;
+        }
+
         /* Responsive Design */
         @media (max-width: 768px) {
             .product-image-main {
@@ -470,10 +598,11 @@
             <!-- Product Gallery -->
             <div class="col-lg-6" data-aos="fade-right">
                 <div class="product-gallery">
-                    <div class="product-image-main">
+                    <div class="product-image-main" id="mainImage">
                         <img id="productImage" src="" alt="Product Image">
-                        <div class="image-overlay"></div>
+                        <div class="zoom-lens"></div>
                     </div>
+                    <div class="zoom-result"></div>
                     <button class="wishlist-btn" id="wishlistBtn">
                         <i class="bi bi-heart"></i>
                     </button>
@@ -485,11 +614,49 @@
                 <div class="product-info">
                     <span class="product-category" id="productCategory"></span>
                     <h1 class="product-title" id="productName"></h1>
+                    
+                    <!-- Rating Section -->
+                    <div class="rating-container">
+                        <div class="rating-stars">
+                            <i class="bi bi-star-fill"></i>
+                            <i class="bi bi-star-fill"></i>
+                            <i class="bi bi-star-fill"></i>
+                            <i class="bi bi-star-fill"></i>
+                            <i class="bi bi-star-half"></i>
+                        </div>
+                        <span class="rating-count">(4.5/5 from 120 reviews)</span>
+                    </div>
+
+                    <!-- Availability Badge -->
+                    <div class="availability-badge in-stock">
+                        <i class="bi bi-check-circle-fill me-2"></i>In Stock
+                    </div>
+
                     <div class="product-price">
-                        <span class="price-currency">₹</span>
                         <span id="productPrice"></span>
                     </div>
                     <p class="lead mb-4" id="productDescription"></p>
+
+                    <!-- Share Buttons -->
+                    <div class="share-buttons">
+                        <button class="share-btn" onclick="shareProduct('facebook')">
+                            <i class="bi bi-facebook"></i>
+                        </button>
+                        <button class="share-btn" onclick="shareProduct('twitter')">
+                            <i class="bi bi-twitter"></i>
+                        </button>
+                        <button class="share-btn" onclick="shareProduct('whatsapp')">
+                            <i class="bi bi-whatsapp"></i>
+                        </button>
+                        <button class="share-btn" onclick="shareProduct('pinterest')">
+                            <i class="bi bi-pinterest"></i>
+                        </button>
+                    </div>
+
+                    <!-- Compare Button -->
+                    <button class="compare-btn mb-4" onclick="addToComparison()">
+                        <i class="bi bi-arrow-left-right"></i> Compare
+                    </button>
 
                     <!-- Quantity Control -->
                     <div class="quantity-control">
@@ -621,6 +788,14 @@
             <h3 class="mb-4">You May Also Like</h3>
             <div class="row g-4" id="similarProducts">
                 <!-- Similar products will be dynamically added here -->
+            </div>
+        </div>
+
+        <!-- Recently Viewed Section -->
+        <div class="recently-viewed mt-5" data-aos="fade-up">
+            <h3>Recently Viewed</h3>
+            <div class="row g-4" id="recentlyViewed">
+                <!-- Recently viewed products will be dynamically added here -->
             </div>
         </div>
     </div>
@@ -1066,6 +1241,142 @@
         // Initialize
         updateCartCount();
         showSimilarProducts();
+
+        // Recently Viewed Functionality
+        function updateRecentlyViewed() {
+            const product = products.find(p => p.id === productId);
+            let recentlyViewed = JSON.parse(localStorage.getItem('recentlyViewed')) || [];
+
+            // Remove if already exists
+            recentlyViewed = recentlyViewed.filter(p => p.id !== product.id);
+            
+            // Add to beginning
+            recentlyViewed.unshift({
+                id: product.id,
+                name: product.name,
+                price: product.price,
+                img: product.img,
+                category: product.category
+            });
+
+            // Keep only last 4 viewed products
+            recentlyViewed = recentlyViewed.slice(0, 4);
+            localStorage.setItem('recentlyViewed', JSON.stringify(recentlyViewed));
+
+            // Display recently viewed products
+            const container = document.getElementById('recentlyViewed');
+            container.innerHTML = recentlyViewed.map(p => `
+                <div class="col-md-3">
+                    <div class="similar-product-card">
+                        <img src="${p.img}" alt="${p.name}" class="img-fluid mb-3">
+                        <h6>${p.name}</h6>
+                        <p class="text-muted mb-2">₹${p.price}</p>
+                        <a href="product-details.html?id=${p.id}" class="btn btn-outline-dark btn-sm w-100">View Details</a>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Initialize new features
+        document.addEventListener('DOMContentLoaded', function() {
+            updateRecentlyViewed();
+        });
+
+        // Share Product Functionality
+        function shareProduct(platform) {
+            const product = products.find(p => p.id === productId);
+            const url = window.location.href;
+            const text = `Check out this amazing ${product.name} from Sonata!`;
+
+            switch(platform) {
+                case 'facebook':
+                    window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`);
+                    break;
+                case 'twitter':
+                    window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`);
+                    break;
+                case 'whatsapp':
+                    window.open(`https://wa.me/?text=${encodeURIComponent(text + ' ' + url)}`);
+                    break;
+                case 'pinterest':
+                    window.open(`https://pinterest.com/pin/create/button/?url=${encodeURIComponent(url)}&media=${encodeURIComponent(product.img)}&description=${encodeURIComponent(text)}`);
+                    break;
+            }
+        }
+
+        // Comparison Functionality
+        function addToComparison() {
+            const product = products.find(p => p.id === productId);
+            let comparison = JSON.parse(localStorage.getItem('comparison')) || [];
+
+            if (comparison.length >= 3) {
+                alert('You can compare up to 3 products at a time. Please remove some products from comparison first.');
+                return;
+            }
+
+            if (!comparison.some(p => p.id === product.id)) {
+                comparison.push({
+                    id: product.id,
+                    name: product.name,
+                    price: product.price,
+                    img: product.img,
+                    category: product.category
+                });
+                localStorage.setItem('comparison', JSON.stringify(comparison));
+                alert('Product added to comparison!');
+            } else {
+                alert('Product is already in comparison!');
+            }
+        }
+
+        // Zoom Functionality
+        function initZoom() {
+            const mainImage = document.getElementById('mainImage');
+            const lens = document.querySelector('.zoom-lens');
+            const result = document.querySelector('.zoom-result');
+            const productImage = document.getElementById('productImage');
+
+            mainImage.addEventListener('mousemove', (e) => {
+                const rect = mainImage.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+
+                // Show lens and result
+                lens.style.display = 'block';
+                result.style.display = 'block';
+
+                // Position lens
+                const lensX = x - lens.offsetWidth / 2;
+                const lensY = y - lens.offsetHeight / 2;
+
+                // Keep lens within image bounds
+                const maxX = rect.width - lens.offsetWidth;
+                const maxY = rect.height - lens.offsetHeight;
+
+                lens.style.left = `${Math.min(Math.max(0, lensX), maxX)}px`;
+                lens.style.top = `${Math.min(Math.max(0, lensY), maxY)}px`;
+
+                // Calculate zoom
+                const cx = result.offsetWidth / lens.offsetWidth;
+                const cy = result.offsetHeight / lens.offsetHeight;
+
+                // Position zoomed image
+                result.style.backgroundImage = `url(${productImage.src})`;
+                result.style.backgroundSize = `${rect.width * cx}px ${rect.height * cy}px`;
+                result.style.backgroundPosition = `-${lensX * cx}px -${lensY * cy}px`;
+            });
+
+            mainImage.addEventListener('mouseleave', () => {
+                lens.style.display = 'none';
+                result.style.display = 'none';
+            });
+        }
+
+        // Initialize features
+        document.addEventListener('DOMContentLoaded', function() {
+            initZoom();
+            updateRecentlyViewed();
+        });
     </script>
 </body>
 
