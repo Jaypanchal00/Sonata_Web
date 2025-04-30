@@ -651,7 +651,17 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Initialize cart count
+        // =============================================
+        // DOM Elements and Initial State
+        // =============================================
+        let currentStep = 1;
+        const steps = document.querySelectorAll('.step');
+        const sections = document.querySelectorAll('.checkout-section');
+        const progressBar = document.querySelector('.progress-bar');
+
+        // =============================================
+        // Utility Functions
+        // =============================================
         function updateCartCount() {
             const cart = JSON.parse(localStorage.getItem('cart')) || [];
             const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
@@ -662,7 +672,6 @@
             }
         }
 
-        // Enhanced error handling
         function showError(element, message) {
             const existingError = element.parentNode.querySelector('.invalid-feedback');
             if (existingError) {
@@ -683,12 +692,9 @@
             }, 5000);
         }
 
-        // Step navigation
-        let currentStep = 1;
-        const steps = document.querySelectorAll('.step');
-        const sections = document.querySelectorAll('.checkout-section');
-        const progressBar = document.querySelector('.progress-bar');
-
+        // =============================================
+        // Step Navigation Functions
+        // =============================================
         function updateProgress() {
             const progress = ((currentStep - 1) / (steps.length - 1)) * 100;
             progressBar.style.width = `${progress}%`;
@@ -717,7 +723,9 @@
             });
         }
 
-        // Shipping form validation
+        // =============================================
+        // Form Validation Functions
+        // =============================================
         function validateShippingForm() {
             const form = document.getElementById('shippingForm');
             const requiredFields = form.querySelectorAll('[required]');
@@ -772,7 +780,6 @@
             return isValid;
         }
 
-        // Payment form validation
         function validatePaymentForm() {
             const selectedMethod = document.querySelector('.payment-method.selected');
             if (!selectedMethod) {
@@ -819,7 +826,40 @@
             return true;
         }
 
-        // Order review update
+        // =============================================
+        // Order Summary Functions
+        // =============================================
+        function calculateSubtotal() {
+            const cart = JSON.parse(localStorage.getItem('cart')) || [];
+            return cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+        }
+
+        function updateOrderSummary() {
+            const subtotal = calculateSubtotal();
+            const tax = Math.round(subtotal * 0.05);
+            const shipping = subtotal >= 999 ? 0 : 99;
+            
+            document.getElementById('subtotal').textContent = `₹${subtotal}`;
+            document.getElementById('tax').textContent = `₹${tax}`;
+            document.getElementById('shipping').textContent = shipping === 0 ? 'Free' : `₹${shipping}`;
+            
+            updateTotal();
+        }
+
+        function updateTotal() {
+            const subtotal = calculateSubtotal();
+            const tax = Math.round(subtotal * 0.05);
+            const shipping = subtotal >= 999 ? 0 : 99;
+            const discount = promoDiscount.style.display === 'flex' ? 
+                parseInt(discountAmount.textContent.replace('-₹', '')) : 0;
+            
+            const total = subtotal + tax + shipping - discount;
+            document.getElementById('total').textContent = `₹${total}`;
+        }
+
+        // =============================================
+        // Order Review Functions
+        // =============================================
         function updateOrderReview() {
             try {
                 const shippingData = JSON.parse(localStorage.getItem('shippingData')) || {};
@@ -916,36 +956,9 @@
             }
         }
 
-        // Order summary calculations
-        function calculateSubtotal() {
-            const cart = JSON.parse(localStorage.getItem('cart')) || [];
-            return cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-        }
-
-        function updateOrderSummary() {
-            const subtotal = calculateSubtotal();
-            const tax = Math.round(subtotal * 0.05);
-            const shipping = subtotal >= 999 ? 0 : 99;
-            
-            document.getElementById('subtotal').textContent = `₹${subtotal}`;
-            document.getElementById('tax').textContent = `₹${tax}`;
-            document.getElementById('shipping').textContent = shipping === 0 ? 'Free' : `₹${shipping}`;
-            
-            updateTotal();
-        }
-
-        function updateTotal() {
-            const subtotal = calculateSubtotal();
-            const tax = Math.round(subtotal * 0.05);
-            const shipping = subtotal >= 999 ? 0 : 99;
-            const discount = promoDiscount.style.display === 'flex' ? 
-                parseInt(discountAmount.textContent.replace('-₹', '')) : 0;
-            
-            const total = subtotal + tax + shipping - discount;
-            document.getElementById('total').textContent = `₹${total}`;
-        }
-
+        // =============================================
         // Event Listeners
+        // =============================================
         document.addEventListener('DOMContentLoaded', () => {
             updateCartCount();
             updateOrderSummary();
@@ -999,8 +1012,8 @@
         document.getElementById('placeOrderBtn').addEventListener('click', () => {
             try {
                 if (!validateShippingForm() || !validatePaymentForm()) {
-                return;
-            }
+                    return;
+                }
 
                 const shippingData = JSON.parse(localStorage.getItem('shippingData')) || {};
                 const paymentData = JSON.parse(localStorage.getItem('paymentData')) || {};
@@ -1029,16 +1042,16 @@
 
                 localStorage.setItem('orderData', JSON.stringify(orderData));
 
-            const button = document.getElementById('placeOrderBtn');
-            const originalText = button.innerHTML;
-            button.disabled = true;
-            button.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Processing...';
+                const button = document.getElementById('placeOrderBtn');
+                const originalText = button.innerHTML;
+                button.disabled = true;
+                button.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Processing...';
 
-            setTimeout(() => {
-                localStorage.removeItem('cart');
+                setTimeout(() => {
+                    localStorage.removeItem('cart');
                     localStorage.removeItem('checkoutFormData');
-                window.location.href = 'order-confirmation.html';
-            }, 1500);
+                    window.location.href = 'order-confirmation.html';
+                }, 1500);
 
             } catch (error) {
                 console.error('Error in place order:', error);
