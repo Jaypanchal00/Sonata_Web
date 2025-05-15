@@ -7,6 +7,7 @@
     <title>Shopping Cart - Sonata</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link rel="shortcut icon" href="https://www.titancompany.in/sites/default/files/Sonata.png" type="image/x-icon">
     <style>
         :root {
             --primary-color: #2c3e50;
@@ -123,6 +124,8 @@
             display: flex;
             align-items: center;
             margin-bottom: 0.5rem;
+            width: 100%;
+            justify-content: flex-end;
         }
 
         .quantity-control .btn {
@@ -137,6 +140,7 @@
             border: 1px solid var(--light-bg);
             color: var(--primary-color);
             transition: var(--transition);
+            flex-shrink: 0;
         }
 
         .quantity-control .btn:hover {
@@ -145,13 +149,15 @@
         }
 
         .quantity-control input {
-            width: 40px;
+            width: 50px;
             height: 32px;
             text-align: center;
             border: 1px solid var(--light-bg);
             border-radius: var(--border-radius);
             margin: 0 0.5rem;
             font-size: 0.9rem;
+            flex-shrink: 0;
+            background: white;
         }
 
         .quantity-control input:focus {
@@ -380,7 +386,7 @@
                 <a href="wishlist.html" class="text-dark text-decoration-none">
                     <i class="bi bi-heart fs-5"></i>
                 </a>
-                <a href="cart.html" class="text-dark text-decoration-none position-relative">
+                <a href="#" class="text-dark text-decoration-none position-relative" data-bs-toggle="offcanvas" data-bs-target="#cartOffcanvas">
                     <i class="bi bi-bag fs-5"></i>
                     <span class="cart-count" id="cartCount">0</span>
                 </a>
@@ -415,6 +421,11 @@
                         <span id="tax">₹0</span>
                     </div>
                     
+                    <div class="summary-row" id="discountRow" style="display: none;">
+                        <span>Discount</span>
+                        <span class="text-success" id="discountAmount">-₹0</span>
+                    </div>
+                    
                     <hr>
                     
                     <div class="summary-row">
@@ -430,12 +441,53 @@
         </div>
     </div>
 
+    <!-- Cart Offcanvas -->
+    <div class="offcanvas offcanvas-end" tabindex="-1" id="cartOffcanvas">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title">Your Cart</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+        </div>
+        <div class="offcanvas-body">
+            <div id="offcanvasCartItems">
+                <!-- Cart items will be dynamically added here -->
+            </div>
+            <div class="cart-summary mt-3">
+                <div class="d-flex justify-content-between mb-2">
+                    <span>Subtotal</span>
+                    <span id="offcanvasSubtotal">₹0</span>
+                </div>
+                <div class="d-flex justify-content-between mb-2">
+                    <span>Shipping</span>
+                    <span>Free</span>
+                </div>
+                <hr>
+                <div class="d-flex justify-content-between mb-4">
+                    <strong>Total</strong>
+                    <strong id="offcanvasTotal">₹0</strong>
+                </div>
+                <a href="cart.html" class="btn btn-dark w-100 mb-2">View Cart</a>
+                <a href="checkout.html" class="btn btn-outline-dark w-100">Checkout</a>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         function updateCartDisplay() {
             const cart = JSON.parse(localStorage.getItem('cart')) || [];
             const cartItemsContainer = document.getElementById('cartItems');
             let subtotal = 0;
+            let discount = 0;
+            // Example: apply a 10% discount if subtotal > 2000
+            if (cart.length > 0) {
+                cart.forEach(item => {
+                    const itemTotal = item.price * item.quantity;
+                    subtotal += itemTotal;
+                });
+                if (subtotal > 2000) {
+                    discount = Math.round(subtotal * 0.10);
+                }
+            }
 
             if (cart.length === 0) {
                 cartItemsContainer.innerHTML = `
@@ -506,12 +558,19 @@
             });
 
             // Calculate tax (for example, 5% of subtotal)
-            const tax = Math.round(subtotal * 0.05);
-            const total = subtotal + tax;
+            const tax = Math.round((subtotal - discount) * 0.05);
+            const total = subtotal - discount + tax;
             
             document.getElementById('subtotal').textContent = `₹${subtotal}`;
             document.getElementById('tax').textContent = `₹${tax}`;
             document.getElementById('total').textContent = `₹${total}`;
+            if (discount > 0) {
+                document.getElementById('discountRow').style.display = 'flex';
+                document.getElementById('discountAmount').textContent = `-₹${discount}`;
+            } else {
+                document.getElementById('discountRow').style.display = 'none';
+                document.getElementById('discountAmount').textContent = '-₹0';
+            }
             document.getElementById('checkoutBtn').disabled = false;
         }
 
@@ -553,6 +612,81 @@
         // Checkout button event
         document.getElementById('checkoutBtn').addEventListener('click', () => {
             window.location.href = 'checkout.html';
+        });
+
+        function updateOffcanvasCart() {
+            const cart = JSON.parse(localStorage.getItem('cart')) || [];
+            const cartItemsContainer = document.getElementById('offcanvasCartItems');
+            let subtotal = 0;
+
+            if (cart.length === 0) {
+                cartItemsContainer.innerHTML = `
+                    <div class="text-center py-4">
+                        <i class="bi bi-cart-x display-1 text-muted"></i>
+                        <p class="mt-3">Your cart is empty</p>
+                    </div>
+                `;
+                document.getElementById('offcanvasSubtotal').textContent = '₹0';
+                document.getElementById('offcanvasTotal').textContent = '₹0';
+                return;
+            }
+
+            cartItemsContainer.innerHTML = cart.map(item => {
+                const itemTotal = item.price * item.quantity;
+                subtotal += itemTotal;
+
+                return `
+                    <div class="cart-item d-flex align-items-center mb-3">
+                        <img src="${item.img}" alt="${item.name}" style="width: 60px; height: 60px; object-fit: contain; border-radius: 8px; margin-right: 12px;">
+                        <div class="cart-item-details flex-grow-1">
+                            <div class="cart-item-title">${item.name}</div>
+                            <div class="cart-item-price">₹${item.price}</div>
+                            <div class="cart-item-quantity d-flex align-items-center mt-1">
+                                <div class="quantity-btn btn btn-sm btn-outline-secondary px-2 py-0 me-1" onclick="updateOffcanvasQuantity(${item.id}, -1)">-</div>
+                                <input type="text" class="quantity-input form-control form-control-sm text-center" value="${item.quantity}" readonly style="width: 36px;">
+                                <div class="quantity-btn btn btn-sm btn-outline-secondary px-2 py-0 ms-1" onclick="updateOffcanvasQuantity(${item.id}, 1)">+</div>
+                                <span class="remove-item ms-2 text-danger" style="cursor:pointer;" onclick="removeOffcanvasItem(${item.id})">
+                                    <i class="bi bi-trash"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            document.getElementById('offcanvasSubtotal').textContent = `₹${subtotal}`;
+            document.getElementById('offcanvasTotal').textContent = `₹${subtotal}`;
+        }
+
+        function updateOffcanvasQuantity(productId, change) {
+            let cart = JSON.parse(localStorage.getItem('cart')) || [];
+            const item = cart.find(item => item.id === productId);
+
+            if (item) {
+                item.quantity += change;
+                if (item.quantity < 1) {
+                    cart = cart.filter(item => item.id !== productId);
+                }
+                localStorage.setItem('cart', JSON.stringify(cart));
+                updateOffcanvasCart();
+                updateCartCount();
+                updateCartDisplay(); // Also update main cart display if on cart page
+            }
+        }
+
+        function removeOffcanvasItem(productId) {
+            let cart = JSON.parse(localStorage.getItem('cart')) || [];
+            cart = cart.filter(item => item.id !== productId);
+            localStorage.setItem('cart', JSON.stringify(cart));
+            updateOffcanvasCart();
+            updateCartCount();
+            updateCartDisplay(); // Also update main cart display if on cart page
+        }
+
+        // Initialize offcanvas cart when it's shown
+        const offcanvasElem = document.getElementById('cartOffcanvas');
+        offcanvasElem && offcanvasElem.addEventListener('show.bs.offcanvas', function () {
+            updateOffcanvasCart();
         });
     </script>
 </body>
