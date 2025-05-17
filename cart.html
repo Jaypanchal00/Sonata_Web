@@ -526,24 +526,39 @@
                                     <div class="cart-item-details">
                                         <h5>${item.name}</h5>
                                         <p class="cart-item-price">₹${item.price}</p>
+                                        ${item.selectedColor ? `
+                                        <div class="selected-color d-flex align-items-center mb-2">
+                                            <span class="me-2">Color:</span>
+                                            <div class="color-dot" style="
+                                                width: 20px;
+                                                height: 20px;
+                                                border-radius: 50%;
+                                                background-color: ${item.selectedColor.code};
+                                                border: 1px solid #ddd;
+                                                display: inline-block;
+                                                margin-right: 8px;
+                                            "></div>
+                                            <span class="color-name">${item.selectedColor.name}</span>
+                                        </div>
+                                        ` : ''}
                                     </div>
                                 </div>
                                 
                                 <div class="col-md-5">
                                     <div class="d-md-flex flex-column align-items-md-end cart-item-actions">
                                         <div class="quantity-control">
-                                            <button class="btn" onclick="updateQuantity(${item.id}, -1)">
+                                            <button class="btn" onclick="updateQuantity(${item.id}, '${item.variantId}', -1)">
                                                 <i class="bi bi-dash"></i>
                                             </button>
                                             <input type="number" class="form-control" value="${item.quantity}" min="1" readonly>
-                                            <button class="btn" onclick="updateQuantity(${item.id}, 1)">
+                                            <button class="btn" onclick="updateQuantity(${item.id}, '${item.variantId}', 1)">
                                                 <i class="bi bi-plus"></i>
                                             </button>
                                         </div>
                                         
                                         <div class="d-flex justify-content-between align-items-center mt-2 mt-md-3">
                                             <span class="item-total">₹${itemTotal}</span>
-                                            <button class="remove-btn ms-3" onclick="removeItem(${item.id})">
+                                            <button class="remove-btn ms-3" onclick="removeItem('${item.variantId}')">
                                                 <i class="bi bi-trash me-1"></i>Remove
                                             </button>
                                         </div>
@@ -574,15 +589,15 @@
             document.getElementById('checkoutBtn').disabled = false;
         }
 
-        function updateQuantity(productId, change) {
+        function updateQuantity(productId, variantId, change) {
             let cart = JSON.parse(localStorage.getItem('cart')) || [];
-            const item = cart.find(item => item.id === productId);
+            const item = cart.find(item => item.variantId === variantId);
             
             if (item) {
                 item.quantity += change;
                 
                 if (item.quantity < 1) {
-                    cart = cart.filter(item => item.id !== productId);
+                    cart = cart.filter(item => item.variantId !== variantId);
                 }
                 
                 localStorage.setItem('cart', JSON.stringify(cart));
@@ -591,9 +606,9 @@
             }
         }
 
-        function removeItem(productId) {
+        function removeItem(variantId) {
             let cart = JSON.parse(localStorage.getItem('cart')) || [];
-            cart = cart.filter(item => item.id !== productId);
+            cart = cart.filter(item => item.variantId !== variantId);
             localStorage.setItem('cart', JSON.stringify(cart));
             updateCartDisplay();
             updateCartCount();
@@ -641,11 +656,29 @@
                         <div class="cart-item-details flex-grow-1">
                             <div class="cart-item-title">${item.name}</div>
                             <div class="cart-item-price">₹${item.price}</div>
+                            ${item.selectedColor ? `
+                            <div class="selected-color d-flex align-items-center mt-1 mb-1">
+                                <div class="color-dot" style="
+                                    width: 16px;
+                                    height: 16px;
+                                    border-radius: 50%;
+                                    background-color: ${item.selectedColor.code};
+                                    border: 1px solid #ddd;
+                                    display: inline-block;
+                                    margin-right: 8px;
+                                "></div>
+                                <span class="color-name small">${item.selectedColor.name}</span>
+                            </div>
+                            ` : ''}
                             <div class="cart-item-quantity d-flex align-items-center mt-1">
-                                <div class="quantity-btn btn btn-sm btn-outline-secondary px-2 py-0 me-1" onclick="updateOffcanvasQuantity(${item.id}, -1)">-</div>
-                                <input type="text" class="quantity-input form-control form-control-sm text-center" value="${item.quantity}" readonly style="width: 36px;">
-                                <div class="quantity-btn btn btn-sm btn-outline-secondary px-2 py-0 ms-1" onclick="updateOffcanvasQuantity(${item.id}, 1)">+</div>
-                                <span class="remove-item ms-2 text-danger" style="cursor:pointer;" onclick="removeOffcanvasItem(${item.id})">
+                                <div class="quantity-btn btn btn-sm btn-outline-secondary px-2 py-0 me-1" 
+                                     onclick="updateOffcanvasQuantity(${item.id}, '${item.variantId}', -1)">-</div>
+                                <input type="text" class="quantity-input form-control form-control-sm text-center" 
+                                       value="${item.quantity}" readonly style="width: 36px;">
+                                <div class="quantity-btn btn btn-sm btn-outline-secondary px-2 py-0 ms-1" 
+                                     onclick="updateOffcanvasQuantity(${item.id}, '${item.variantId}', 1)">+</div>
+                                <span class="remove-item ms-2 text-danger" style="cursor:pointer;" 
+                                      onclick="removeOffcanvasItem('${item.variantId}')">
                                     <i class="bi bi-trash"></i>
                                 </span>
                             </div>
@@ -658,29 +691,29 @@
             document.getElementById('offcanvasTotal').textContent = `₹${subtotal}`;
         }
 
-        function updateOffcanvasQuantity(productId, change) {
+        function updateOffcanvasQuantity(productId, variantId, change) {
             let cart = JSON.parse(localStorage.getItem('cart')) || [];
-            const item = cart.find(item => item.id === productId);
+            const item = cart.find(item => item.variantId === variantId);
 
             if (item) {
                 item.quantity += change;
                 if (item.quantity < 1) {
-                    cart = cart.filter(item => item.id !== productId);
+                    cart = cart.filter(item => item.variantId !== variantId);
                 }
                 localStorage.setItem('cart', JSON.stringify(cart));
                 updateOffcanvasCart();
                 updateCartCount();
-                updateCartDisplay(); // Also update main cart display if on cart page
+                updateCartDisplay();
             }
         }
 
-        function removeOffcanvasItem(productId) {
+        function removeOffcanvasItem(variantId) {
             let cart = JSON.parse(localStorage.getItem('cart')) || [];
-            cart = cart.filter(item => item.id !== productId);
+            cart = cart.filter(item => item.variantId !== variantId);
             localStorage.setItem('cart', JSON.stringify(cart));
             updateOffcanvasCart();
             updateCartCount();
-            updateCartDisplay(); // Also update main cart display if on cart page
+            updateCartDisplay();
         }
 
         // Initialize offcanvas cart when it's shown

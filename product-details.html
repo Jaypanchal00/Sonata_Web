@@ -568,6 +568,62 @@
                 height: 120px;
             }
         }
+
+        /* Add these styles to your existing CSS */
+        .color-options {
+            margin: 15px 0;
+        }
+
+        .color-option {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            position: relative;
+            border: 2px solid transparent;
+            transition: all 0.2s ease;
+        }
+
+        .color-option:hover {
+            transform: scale(1.1);
+        }
+
+        .color-option.active {
+            border-color: var(--accent-color);
+        }
+
+        .color-option::after {
+            content: '';
+            position: absolute;
+            top: -4px;
+            left: -4px;
+            right: -4px;
+            bottom: -4px;
+            border: 1px solid #ddd;
+            border-radius: 50%;
+        }
+
+        .color-tooltip {
+            position: absolute;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            white-space: nowrap;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.2s ease;
+        }
+
+        .color-option:hover .color-tooltip {
+            opacity: 1;
+            visibility: visible;
+            bottom: 120%;
+        }
     </style>
 </head>
 
@@ -626,6 +682,12 @@
                             <i class="bi bi-star-half"></i>
                         </div>
                         <span class="rating-count">(4.5/5 from 120 reviews)</span>
+                    </div>
+
+                    <!-- Color Options -->
+                    <div class="color-options mb-4">
+                        <h6 class="mb-2">Available Colors:</h6>
+                        <div class="d-flex gap-2" id="colorOptions"></div>
                     </div>
 
                     <!-- Availability Badge -->
@@ -806,8 +868,15 @@
         // Define products array (same as in index.html)
         const products = [
             {
-                id: 1, name: "Men's Blue Watch", price: 1595, category: "Men", img: "https://www.sonatawatches.in/dw/image/v2/BKDD_PRD/on/demandware.static/-/Sites-titan-master-catalog/default/dwd3651491/images/Sonata/Catalog/SP70050SP01_1.jpg?sw=360&sh=360", shortDesc: "Elegant and bold.",
-                fullDesc: "This Royal Black Watch is crafted with a stainless steel body, sapphire glass, and a leather strap. Perfect for any occasion."
+                id: 1, name: "Men's Blue Watch", price: 1595, category: "Men", 
+                img: "https://www.sonatawatches.in/dw/image/v2/BKDD_PRD/on/demandware.static/-/Sites-titan-master-catalog/default/dwd3651491/images/Sonata/Catalog/SP70050SP01_1.jpg?sw=360&sh=360", 
+                shortDesc: "Elegant and bold.",
+                fullDesc: "This Royal Black Watch is crafted with a stainless steel body, sapphire glass, and a leather strap. Perfect for any occasion.",
+                colors: [
+                    { name: "Blue", code: "#1a75ff" },
+                    { name: "Black", code: "#000000" },
+                    { name: "Silver", code: "#C0C0C0" }
+                ]
             },
             {
                 id: 2, name: "Women's Rose Gold", price: 1799, category: "Women", img: "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcSSOtKnzqNbmOUn0s704JKFfsQzjt2NzFDXd07eYex7Ww495tdz-egU4pI_h6aPsb0CJjE-oMtLJH0rM0zJVe1xlRKRwVrHOeisRsHYfVmz", shortDesc: "Elegant and bold.",
@@ -1025,6 +1094,17 @@
 
         ];
 
+        // Add default colors for all products if not specified
+        products.forEach(product => {
+            if (!product.colors) {
+                product.colors = [
+                    { name: "Silver", code: "#C0C0C0" },
+                    { name: "Gold", code: "#FFD700" },
+                    { name: "Rose Gold", code: "#B76E79" }
+                ];
+            }
+        });
+
         // Get product details from URL parameters
         const urlParams = new URLSearchParams(window.location.search);
         const productId = parseInt(urlParams.get('id'));
@@ -1042,6 +1122,7 @@
             document.getElementById('productFullDescription').textContent = product.fullDesc;
             document.getElementById('modelNumber').textContent = `SP${product.id}`;
             document.getElementById('style').textContent = product.category;
+            displayColorOptions(product);
         } else {
             // Handle case when product is not found
             document.querySelector('.container').innerHTML = `
@@ -1065,20 +1146,13 @@
                 return;
             }
 
+            if (!window.selectedColor) {
+                alert('Please select a color first!');
+                return;
+            }
+
             addToCart(product);
             updateCartCount();
-
-            // Show success message
-            const successMsg = document.createElement('div');
-            successMsg.className = 'toast-message position-fixed top-0 start-50 translate-middle-x mt-3';
-            successMsg.style.zIndex = '1000';
-            successMsg.textContent = 'Item added to cart successfully!';
-            document.body.appendChild(successMsg);
-
-            // Remove message after 3 seconds
-            setTimeout(() => {
-                successMsg.remove();
-            }, 3000);
         });
 
         // Buy now functionality
@@ -1146,23 +1220,62 @@
         // Cart functions
         function addToCart(product) {
             let cart = JSON.parse(localStorage.getItem('cart')) || [];
-            const existingItem = cart.find(item => item.id === product.id);
+            
+            // Check if the exact same product with the same color exists
+            const existingItem = cart.find(item => 
+                item.id === product.id && 
+                item.selectedColor && 
+                window.selectedColor &&
+                item.selectedColor.name === window.selectedColor.name
+            );
 
             if (existingItem) {
-                // Show prompt that product is already in cart
-                alert('Product has been already added in cart!');
+                // Show prompt that this color variant is already in cart
+                alert(`This product in ${window.selectedColor.name} color is already in your cart!`);
                 return;
             }
 
-            cart.push({
+            // If no color is selected, use the first color as default
+            const selectedColor = window.selectedColor || product.colors[0];
+
+            // Create a unique identifier for this product+color combination
+            const cartItem = {
                 id: product.id,
                 name: product.name,
                 price: product.price,
                 img: product.img,
-                quantity: 1
-            });
+                quantity: 1,
+                selectedColor: selectedColor,
+                // Create a unique ID for this color variant
+                variantId: `${product.id}-${selectedColor.name.toLowerCase().replace(/\s+/g, '-')}`
+            };
 
+            cart.push(cartItem);
             localStorage.setItem('cart', JSON.stringify(cart));
+
+            // Show success message with color information
+            const successMsg = document.createElement('div');
+            successMsg.className = 'toast-message position-fixed top-0 start-50 translate-middle-x mt-3';
+            successMsg.style.zIndex = '1000';
+            successMsg.innerHTML = `
+                <div class="d-flex align-items-center">
+                    <div class="color-dot me-2" style="
+                        width: 15px;
+                        height: 15px;
+                        border-radius: 50%;
+                        background-color: ${selectedColor.code};
+                        border: 1px solid #ddd;
+                        display: inline-block;
+                    "></div>
+                    <span>${product.name} (${selectedColor.name}) added to cart!</span>
+                </div>
+            `;
+            document.body.appendChild(successMsg);
+
+            // Remove message after 3 seconds
+            setTimeout(() => {
+                successMsg.remove();
+            }, 3000);
         }
 
         function updateCartCount() {
@@ -1358,6 +1471,52 @@
             initZoom();
             updateRecentlyViewed();
         });
+
+        // Add this to your existing JavaScript code
+        function displayColorOptions(product) {
+            const colorOptionsContainer = document.getElementById('colorOptions');
+            colorOptionsContainer.innerHTML = product.colors.map((color, index) => `
+                <div class="color-option ${index === 0 ? 'active' : ''}" 
+                     style="background-color: ${color.code}"
+                     onclick="selectColor(this, '${color.name}', '${color.code}')">
+                    <span class="color-tooltip">${color.name}</span>
+                </div>
+            `).join('');
+            
+            // Set initial selected color
+            window.selectedColor = {
+                name: product.colors[0].name,
+                code: product.colors[0].code
+            };
+        }
+
+        function selectColor(element, colorName, colorCode) {
+            // Remove active class from all color options
+            document.querySelectorAll('.color-option').forEach(option => {
+                option.classList.remove('active');
+            });
+            
+            // Add active class to selected color
+            element.classList.add('active');
+            
+            // Store selected color
+            window.selectedColor = {
+                name: colorName,
+                code: colorCode
+            };
+            
+            // Show selected color in a toast message
+            const successMsg = document.createElement('div');
+            successMsg.className = 'toast-message position-fixed top-0 start-50 translate-middle-x mt-3';
+            successMsg.style.zIndex = '1000';
+            successMsg.textContent = `Selected color: ${colorName}`;
+            document.body.appendChild(successMsg);
+
+            // Remove message after 2 seconds
+            setTimeout(() => {
+                successMsg.remove();
+            }, 2000);
+        }
     </script>
 </body>
 
