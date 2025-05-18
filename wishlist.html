@@ -155,6 +155,11 @@
         // Initialize
         updateWishlistDisplay();
         updateCartCount();
+
+
+         // Update wishlist count
+            const wishlist = JSON.parse(localStorage.getItem('wishlist')) || [];
+            document.getElementById('wishlistCount').textContent = wishlist.length;
     </script>
 </body>
 </html> 
