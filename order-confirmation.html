@@ -28,6 +28,7 @@
             object-fit: cover;
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            
         }
         .order-item {
             display: flex;
@@ -67,6 +68,24 @@
             color: #6c757d;
             font-size: 0.9rem;
         }
+
+
+         .cart-count {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background-color: #ff6b6b;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
     </style>
 </head>
 <body>
@@ -77,11 +96,13 @@
                     alt="Sonata Logo" class="navbar-logo" style="height: 30px; width: auto;" />
             </a>
             <div class="top-icons d-flex align-items-center ms-auto gap-3">
-                <a href="login.html" class="text-dark text-decoration-none">
+                <a href="login.html" class="text-dark text-decoration-none d-flex align-items-center">
                     <i class="bi bi-person fs-5"></i>
+                    <span id="userNameDisplay" class="ms-2" style="color: #ff6b6b; font-weight: 500;"></span>
                 </a>
-                <a href="wishlist.html" class="text-dark text-decoration-none">
+                   <a href="wishlist.html" class="text-dark text-decoration-none position-relative">
                     <i class="bi bi-heart fs-5"></i>
+                    <span class="cart-count" id="wishlistCount">0</span>
                 </a>
                 <a href="cart.html" class="text-dark text-decoration-none position-relative">
                     <i class="bi bi-bag fs-5"></i>
@@ -263,6 +284,34 @@
 
         // Initialize page
         document.addEventListener('DOMContentLoaded', updateOrderDetails);
+
+
+
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            const userNameDisplay = document.getElementById('userNameDisplay');
+            const userIcon = document.querySelector('.bi-person');
+            
+            if (isLoggedIn && currentUser) {
+                userNameDisplay.textContent = currentUser.name;
+                userIcon.setAttribute('title', `Logged in as ${currentUser.name}`);
+                
+                // Add logout functionality
+                userIcon.parentElement.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    if (confirm('Do you want to logout?')) {
+                        localStorage.removeItem('isLoggedIn');
+                        localStorage.removeItem('currentUser');
+                        window.location.reload();
+                    }
+                });
+            } else {
+                userNameDisplay.textContent = '';
+                userIcon.setAttribute('title', 'Login');
+            }
+        });
     </script>
 </body>
 </html> 

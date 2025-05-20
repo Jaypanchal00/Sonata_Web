@@ -48,6 +48,21 @@
             justify-content: center;
         }
 
+        .wishlist-count {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background-color: var(--accent-color);
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            font-size: 0.7rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
         .page-title {
             position: relative;
             color: var(--primary-color);
@@ -380,11 +395,13 @@
                     alt="Sonata Logo" style="height: 30px; width: auto;" />
             </a>
             <div class="ms-auto d-flex align-items-center gap-4">
-                <a href="login.html" class="text-dark text-decoration-none">
+                <a href="login.html" class="text-dark text-decoration-none d-flex align-items-center">
                     <i class="bi bi-person fs-5"></i>
+                    <span id="userNameDisplay" class="ms-2" style="color: #ff6b6b; font-weight: 500;"></span>
                 </a>
-                <a href="wishlist.html" class="text-dark text-decoration-none">
+                <a href="wishlist.html" class="text-dark text-decoration-none position-relative">
                     <i class="bi bi-heart fs-5"></i>
+                    <span class="wishlist-count" id="wishlistCount">0</span>
                 </a>
                 <a href="#" class="text-dark text-decoration-none position-relative" data-bs-toggle="offcanvas" data-bs-target="#cartOffcanvas">
                     <i class="bi bi-bag fs-5"></i>
@@ -473,6 +490,30 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            const userNameDisplay = document.getElementById('userNameDisplay');
+            const userIcon = document.querySelector('.bi-person');
+            
+            if (isLoggedIn && currentUser) {
+                userNameDisplay.textContent = currentUser.name;
+                userIcon.setAttribute('title', `Logged in as ${currentUser.name}`);
+                
+                userIcon.parentElement.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    if (confirm('Do you want to logout?')) {
+                        localStorage.removeItem('isLoggedIn');
+                        localStorage.removeItem('currentUser');
+                        window.location.reload();
+                    }
+                });
+            } else {
+                userNameDisplay.textContent = '';
+                userIcon.setAttribute('title', 'Login');
+            }
+        });
+
         function updateCartDisplay() {
             const cart = JSON.parse(localStorage.getItem('cart')) || [];
             const cartItemsContainer = document.getElementById('cartItems');
@@ -607,11 +648,23 @@
         }
 
         function removeItem(variantId) {
-            let cart = JSON.parse(localStorage.getItem('cart')) || [];
-            cart = cart.filter(item => item.variantId !== variantId);
-            localStorage.setItem('cart', JSON.stringify(cart));
-            updateCartDisplay();
-            updateCartCount();
+            try {
+                let cart = JSON.parse(localStorage.getItem('cart')) || [];
+                // Remove the item with the matching variantId
+                cart = cart.filter(item => item.variantId !== variantId);
+                // Save the updated cart back to localStorage
+                localStorage.setItem('cart', JSON.stringify(cart));
+                // Update the cart display
+                updateCartDisplay();
+                // Update the cart count
+                updateCartCount();
+                // Update the offcanvas cart if it exists
+                if (document.getElementById('offcanvasCartItems')) {
+                    updateOffcanvasCart();
+                }
+            } catch (error) {
+                console.error('Error removing item:', error);
+            }
         }
 
         function updateCartCount() {
@@ -620,13 +673,25 @@
             document.getElementById('cartCount').textContent = totalItems;
         }
 
-        // Initial setup
-        updateCartDisplay();
-        updateCartCount();
+        function updateWishlistCount() {
+            const wishlist = JSON.parse(localStorage.getItem('wishlist')) || [];
+            const totalItems = wishlist.length;
+            document.getElementById('wishlistCount').textContent = totalItems;
+        }
 
-        // Checkout button event
+        // Initialize cart display when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            updateCartDisplay();
+            updateCartCount();
+            updateWishlistCount();
+        });
+
+        // Add event listener for checkout button
         document.getElementById('checkoutBtn').addEventListener('click', () => {
-            window.location.href = 'checkout.html';
+            const cart = JSON.parse(localStorage.getItem('cart')) || [];
+            if (cart.length > 0) {
+                window.location.href = 'checkout.html';
+            }
         });
 
         function updateOffcanvasCart() {

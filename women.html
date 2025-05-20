@@ -365,6 +365,36 @@
             }
         }
 
+        .cart-count {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background-color: #dc3545;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+        }
+
+        .wishlist-count {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background-color: #dc3545;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+        }
+
     </style>
 </head>
 <body>
@@ -383,11 +413,13 @@
             </form>
 
             <div class="top-icons d-flex align-items-center ms-auto gap-3">
-                <a href="login.html" class="text-dark text-decoration-none">
+                <a href="login.html" class="text-dark text-decoration-none d-flex align-items-center">
                     <i class="bi bi-person fs-5"></i>
+                    <span id="userNameDisplay" class="ms-2" style="color: #ff6b6b; font-weight: 500;"></span>
                 </a>
-                <a href="wishlist.html" class="text-dark text-decoration-none">
+                <a href="wishlist.html" class="text-dark text-decoration-none position-relative">
                     <i class="bi bi-heart fs-5"></i>
+                    <span class="wishlist-count" id="wishlistCount">0</span>
                 </a>
                 <a href="cart.html" class="text-dark text-decoration-none position-relative">
                     <i class="bi bi-bag fs-5"></i>
@@ -647,7 +679,7 @@
                             </a>
                             <h6>${p.name}</h6>
                             <p class="text-muted mb-1">₹${p.price}</p>
-                            <button class="btn btn-sm btn-dark" onclick="addToCart(${p.id})">Add to Cart</button>
+                            <a href="product-details.html?id=${p.id}" class="btn btn-sm btn-dark">View Details</a>
                         </div>
                     </div>
                 `;
@@ -739,8 +771,78 @@
             document.getElementById('cartCount').textContent = totalItems;
         }
 
-        // Initialize cart count
+        // Wishlist functions
+        function addToWishlist(productId) {
+            const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+            if (!isLoggedIn) {
+                if (confirm('Please login to add items to wishlist. Do you want to login now?')) {
+                    window.location.href = 'login.html';
+                }
+                return;
+            }
+
+            const product = womenProducts.find(p => p.id === productId);
+            if (product) {
+                let wishlist = JSON.parse(localStorage.getItem('wishlist')) || [];
+                const existingItem = wishlist.find(item => item.id === product.id);
+
+                if (!existingItem) {
+                    wishlist.push({
+                        id: product.id,
+                        name: product.name,
+                        price: product.price,
+                        img: product.img
+                    });
+                    localStorage.setItem('wishlist', JSON.stringify(wishlist));
+                    updateWishlistCount();
+                    alert('Item added to wishlist!');
+                } else {
+                    alert('Item is already in wishlist!');
+                }
+            }
+        }
+
+        function updateWishlistCount() {
+            const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+            if (!isLoggedIn) {
+                document.getElementById('wishlistCount').textContent = '0';
+                return;
+            }
+
+            const wishlist = JSON.parse(localStorage.getItem('wishlist')) || [];
+            document.getElementById('wishlistCount').textContent = wishlist.length;
+        }
+
+        // Initialize cart and wishlist counts
         updateCartCount();
+        updateWishlistCount();
+
+
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            const userNameDisplay = document.getElementById('userNameDisplay');
+            const userIcon = document.querySelector('.bi-person');
+            
+            if (isLoggedIn && currentUser) {
+                userNameDisplay.textContent = currentUser.name;
+                userIcon.setAttribute('title', `Logged in as ${currentUser.name}`);
+                
+                // Add logout functionality
+                userIcon.parentElement.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    if (confirm('Do you want to logout?')) {
+                        localStorage.removeItem('isLoggedIn');
+                        localStorage.removeItem('currentUser');
+                        window.location.reload();
+                    }
+                });
+            } else {
+                userNameDisplay.textContent = '';
+                userIcon.setAttribute('title', 'Login');
+            }
+        });
     </script>
 </body>
 </html> 

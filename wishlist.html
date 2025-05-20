@@ -136,7 +136,8 @@
                         name: product.name,
                         price: product.price,
                         img: product.img,
-                        quantity: 1
+                        quantity: 1,
+                        variantId: `${product.id}-default`
                     });
                 }
                 
@@ -155,11 +156,6 @@
         // Initialize
         updateWishlistDisplay();
         updateCartCount();
-
-
-         // Update wishlist count
-            const wishlist = JSON.parse(localStorage.getItem('wishlist')) || [];
-            document.getElementById('wishlistCount').textContent = wishlist.length;
     </script>
 </body>
 </html> 

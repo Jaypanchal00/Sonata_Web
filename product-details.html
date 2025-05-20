@@ -30,6 +30,27 @@
             --font-extrabold: 800;
         }
 
+        /* Add wishlist count styles */
+        .wishlist-count {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background-color: var(--accent-color);
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: var(--font-bold);
+        }
+
+        .top-icons a {
+            position: relative;
+        }
+
         body {
             background-color: var(--light-bg);
             font-family: 'Poppins', sans-serif;
@@ -636,11 +657,13 @@
                     alt="Sonata Logo" style="height: 30px; width: auto;" />
             </a>
             <div class="top-icons d-flex align-items-center ms-auto gap-3">
-                <a href="login.html" class="text-dark text-decoration-none">
+                <a href="login.html" class="text-dark text-decoration-none d-flex align-items-center">
                     <i class="bi bi-person fs-5"></i>
+                    <span id="userNameDisplay" class="ms-2" style="color: #ff6b6b; font-weight: 500;"></span>
                 </a>
                 <a href="wishlist.html" class="text-dark text-decoration-none">
                     <i class="bi bi-heart fs-5"></i>
+                    <span class="wishlist-count" id="wishlistCount">0</span>
                 </a>
                 <a href="cart.html" class="text-dark text-decoration-none position-relative">
                     <i class="bi bi-bag fs-5"></i>
@@ -1204,6 +1227,7 @@
             }
 
             localStorage.setItem('wishlist', JSON.stringify(wishlist));
+            updateWishlistCount(); // Add this line to update count immediately
         });
 
         // Check if product is in wishlist on page load
@@ -1334,6 +1358,7 @@
 
         // Initialize
         updateCartCount();
+        updateWishlistCount();
         showSimilarProducts();
 
         // Recently Viewed Functionality
@@ -1517,6 +1542,48 @@
                 successMsg.remove();
             }, 2000);
         }
+
+        // Add this to your existing JavaScript code
+        function updateWishlistCount() {
+            const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+            if (!isLoggedIn) {
+                document.getElementById('wishlistCount').textContent = '0';
+                return;
+            }
+
+            const wishlist = JSON.parse(localStorage.getItem('wishlist')) || [];
+            document.getElementById('wishlistCount').textContent = wishlist.length;
+        }
+
+
+
+
+
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            const userNameDisplay = document.getElementById('userNameDisplay');
+            const userIcon = document.querySelector('.bi-person');
+            
+            if (isLoggedIn && currentUser) {
+                userNameDisplay.textContent = currentUser.name;
+                userIcon.setAttribute('title', `Logged in as ${currentUser.name}`);
+                
+                // Add logout functionality
+                userIcon.parentElement.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    if (confirm('Do you want to logout?')) {
+                        localStorage.removeItem('isLoggedIn');
+                        localStorage.removeItem('currentUser');
+                        window.location.reload();
+                    }
+                });
+            } else {
+                userNameDisplay.textContent = '';
+                userIcon.setAttribute('title', 'Login');
+            }
+        });
     </script>
 </body>
 

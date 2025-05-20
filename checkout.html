@@ -110,6 +110,20 @@
             align-items: center;
             justify-content: center;
         }
+        #wishlistCount {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background-color: #dc3545;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
         .address-card {
             border: 1px solid #dee2e6;
             border-radius: 8px;
@@ -159,11 +173,13 @@
                     alt="Sonata Logo" class="navbar-logo" style="height: 30px; width: auto;" />
             </a>
             <div class="top-icons d-flex align-items-center ms-auto gap-3">
-                <a href="login.html" class="text-dark text-decoration-none">
+                <a href="login.html" class="text-dark text-decoration-none d-flex align-items-center">
                     <i class="bi bi-person fs-5"></i>
+                    <span id="userNameDisplay" class="ms-2" style="color: #ff6b6b; font-weight: 500;"></span>
                 </a>
-                <a href="wishlist.html" class="text-dark text-decoration-none">
+                <a href="wishlist.html" class="text-dark text-decoration-none position-relative">
                     <i class="bi bi-heart fs-5"></i>
+                    <span class="wishlist-count" id="wishlistCount">0</span>
                 </a>
                 <a href="cart.html" class="text-dark text-decoration-none position-relative">
                     <i class="bi bi-bag fs-5"></i>
@@ -670,6 +686,12 @@
             }
         }
 
+        function updateWishlistCount() {
+            const wishlist = JSON.parse(localStorage.getItem('wishlist')) || [];
+            const totalItems = wishlist.length;
+            document.getElementById('wishlistCount').textContent = totalItems;
+        }
+
         function showError(element, message) {
             const existingError = element.parentNode.querySelector('.invalid-feedback');
             if (existingError) {
@@ -962,6 +984,7 @@
         // =============================================
         document.addEventListener('DOMContentLoaded', () => {
             updateCartCount();
+            updateWishlistCount();
             updateOrderSummary();
         });
 
@@ -1122,6 +1145,33 @@
                     document.getElementById(`${methodType}Form`).style.display = 'block';
                 }
             });
+        });
+
+
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            const userNameDisplay = document.getElementById('userNameDisplay');
+            const userIcon = document.querySelector('.bi-person');
+            
+            if (isLoggedIn && currentUser) {
+                userNameDisplay.textContent = currentUser.name;
+                userIcon.setAttribute('title', `Logged in as ${currentUser.name}`);
+                
+                // Add logout functionality
+                userIcon.parentElement.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    if (confirm('Do you want to logout?')) {
+                        localStorage.removeItem('isLoggedIn');
+                        localStorage.removeItem('currentUser');
+                        window.location.reload();
+                    }
+                });
+            } else {
+                userNameDisplay.textContent = '';
+                userIcon.setAttribute('title', 'Login');
+            }
         });
     </script>
 </body>
